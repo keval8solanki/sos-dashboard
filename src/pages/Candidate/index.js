@@ -5,7 +5,13 @@ import styled from 'styled-components'
 import { applyJob, getCandidates, getJobs } from '../../api'
 import Table from '../../components/Table'
 import { candidateAtom, candidateCheckedAtom } from '../../recoil/atoms'
-import { PageLayout, TableData, TableHead, TableRow } from '../../styles'
+import {
+	PageLayout,
+	TableData,
+	TableHead,
+	TableRow,
+	IconButton,
+} from '../../styles'
 import Checkbox from '@material-ui/core/Checkbox'
 import Controls from '../../components/Controls'
 import { Button } from '@material-ui/core'
@@ -18,6 +24,8 @@ import {
 import { useRecoilValue } from 'recoil'
 import { filterTrueCandidateChecked } from '../../recoil/selectors'
 import SearchBar from '../../components/SearchBar'
+import AddIcon from '../../assets/icons/add.svg'
+
 
 function CandidatePage() {
 	// React Hooks
@@ -129,12 +137,7 @@ function CandidatePage() {
 						<Button onClick={() => toPage('/job/apply')}>Apply</Button>
 					</>
 				) : (
-					<Button
-						onClick={() => toPage(`${location}/add`)}
-						variant='contained'
-						color='primary'>
-						Add
-					</Button>
+					<IconButton onClick={() => toPage(`${location}/add`)} src={AddIcon} />
 				)}
 				{/* <Button variant="contained" color="primary">Import</Button>
 				<Button variant="contained" color="primary">Export</Button> */}

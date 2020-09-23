@@ -25,4 +25,13 @@ export const getCandidates = `${API_URI}/candidates`
 
 export const applyJob = `${API_URI}/apply`
 
+export const companyEndpoint = `${API_URI}/company`
+export const companiesEndpoint = `${API_URI}/companies`
+
+export const roleEndpoint = `${API_URI}/role`
+export const rolesEndpoint = `${API_URI}/roles`
+
+export const userEndpoint = `${API_URI}/user`
+export const usersEndpoint = `${API_URI}/users`
+
 // export const getPublicJobs = `${API_URI}/public-jobs`

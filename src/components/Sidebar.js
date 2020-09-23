@@ -55,7 +55,7 @@ function Sidebar() {
 	const renderLinks = sidebarData.map(({ icon, linkTo, text }) => {
 		return (
 			<MenuItem key={uniqueID()}>
-				<StyledNavlink activeStyle={activeLinkStyle} exact to={linkTo}>
+				<StyledNavlink activeStyle={activeLinkStyle} to={linkTo}>
 					<NavIcon src={icon} />
 					{text}
 				</StyledNavlink>

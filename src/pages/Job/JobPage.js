@@ -16,6 +16,7 @@ import {
 	jobCheckedAtom,
 } from '../../recoil/atoms'
 import {
+	IconButton,
 	ContentContainer,
 	PageLayout,
 	StyledButton,
@@ -38,6 +39,7 @@ import SearchBar from '../../components/SearchBar'
 import AddIcon from '../../assets/icons/add.svg'
 
 function JobPage({ toApply }) {
+	
 	// React Hooks
 	const history = useHistory()
 	const location = useLocation().pathname
@@ -57,7 +59,7 @@ function JobPage({ toApply }) {
 
 	// Variables
 	const jobHeading = [
-		// 'Select',
+		'Select',
 		'Job Code',
 		'Job Title',
 		'Company',
@@ -172,7 +174,7 @@ function JobPage({ toApply }) {
 					// 	Add
 					// </Button>
 
-					<AddButton onClick={addHandler} src={AddIcon} />
+					<IconButton onClick={addHandler} src={AddIcon} />
 				)}
 			</Controls>
 			<ContentContainer>
@@ -191,8 +193,4 @@ const JobPageContainer = styled.div`
 	background-color: #0000000d;
 	width: 100%;
 	padding: 10px;
-`
-const AddButton = styled.img`
-	width: 28px;
-	cursor: pointer;
 `

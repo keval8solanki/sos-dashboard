@@ -1,11 +1,14 @@
-import { Button, MenuItem, Select } from '@material-ui/core'
+import { Button, IconButton, MenuItem, Select } from '@material-ui/core'
 import Axios from 'axios'
 import React, { useState } from 'react'
 import { createCandidate } from '../../../api'
 import Controls from '../../../components/Controls'
 import {
 	Card,
+	CardTitle,
 	CategoryTitle,
+	ContentContainer,
+	ControlButton,
 	InputContainer,
 	ItemListContainer,
 	MultipleItemInputContainer,
@@ -16,6 +19,9 @@ import {
 	codeGenerator,
 	renderArr,
 } from '../../../utils/helperFunctions'
+
+import { SMUISelect, SMUITextField } from '../../../styles/StyledMaterialUI'
+import AddCircleIcon from '@material-ui/icons/AddCircle'
 
 function CandidateInput() {
 	// Basic
@@ -122,111 +128,112 @@ function CandidateInput() {
 	}
 
 	return (
-		<div>
+		<>
 			<Controls title='Candidate Controls'>
-				<Button color='secondary'>Reset</Button>
-				<Button onClick={saveHandler} variant='contained' color='primary'>
+				<ControlButton color='secondary'>Reset</ControlButton>
+				<ControlButton
+					onClick={saveHandler}
+					variant='contained'
+					color='primary'>
 					Save
-				</Button>
+				</ControlButton>
 			</Controls>
-
-			<Card>
-				<InputContainer>
-					<CategoryTitle>Personal Information - Basic</CategoryTitle>
-					<StyledTextField
+			<ContentContainer>
+				<Card>
+					<CardTitle>Personal Information - Basic</CardTitle>
+					<SMUITextField
 						value={fullName}
 						onChange={(e) => setFullName(e.target.value)}
 						label='Full Name'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						type='email'
 						value={[primaryEmail]}
 						onChange={(e) => setPrimaryEmail(e.target.value)}
 						label='Primary Email'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						type='email'
 						value={secondaryEmail}
 						onChange={(e) => setSecondaryEmail(e.target.value)}
 						label='Secondary Email'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						value={mobile}
 						onChange={(e) => setMobile(e.target.value)}
 						label='Mobile No.'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						value={pan}
 						onChange={(e) => setPan(e.target.value)}
 						label='PAN No'
 					/>
 
-					<input
+					<SMUITextField
 						type='date'
 						value={dateOfBirth}
 						onChange={(e) => setDateOfBirth(e.target.value)}
 					/>
-				</InputContainer>
+				</Card>
 
-				<InputContainer>
-					<CategoryTitle>Personal Information - Address</CategoryTitle>
-					<StyledTextField
+				<Card>
+					<CardTitle>Personal Information - Address</CardTitle>
+					<SMUITextField
 						value={streetName}
 						onChange={(e) => setStreetName(e.target.value)}
 						label='Street Name'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						value={state}
 						onChange={(e) => setState(e.target.value)}
 						label='State'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						value={country}
 						onChange={(e) => setCountry(e.target.value)}
 						label='Country'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						value={pincode}
 						onChange={(e) => setPincode(e.target.value)}
 						label='Pincode'
 					/>
-				</InputContainer>
+				</Card>
+				<Card>
+					<CardTitle>Personal Information - Professional</CardTitle>
 
-				<InputContainer>
-					<CategoryTitle>Personal Information - Professional</CategoryTitle>
-
-					<StyledTextField
+					<SMUITextField
 						value={currentSalary}
 						onChange={(e) => setCurrentSalary(e.target.value)}
 						label='Current Salary'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						value={expected}
 						onChange={(e) => setExpected(e.target.value)}
 						label='Expected Salary'
 					/>
 
-					<Select
+					<SMUISelect
 						value={industry}
 						onChange={(e) => setIndustry(e.target.value)}>
 						<MenuItem value='Finance'>Finance</MenuItem>
 						<MenuItem value='Marketing'>Marketing</MenuItem>
-					</Select>
+					</SMUISelect>
 
-					<Select
+					<SMUISelect
 						value={functionalArea}
 						onChange={(e) => setFunctionalArea(e.target.value)}>
 						<MenuItem value='Software'>Software</MenuItem>
 						<MenuItem value='Accounting'>Accounting</MenuItem>
-					</Select>
+					</SMUISelect>
 
 					{skillSet.length > 0 && (
 						<ItemListContainer>
@@ -238,7 +245,7 @@ function CandidateInput() {
 						onSubmit={(e) =>
 							addValToArr(e, skillSetVal, skillSet, setSkillSet)
 						}>
-						<StyledTextField
+						<SMUITextField
 							value={skillSetVal}
 							onChange={(e) => setSkillSetVal(e.target.value)}
 							label='Skill Set'
@@ -247,10 +254,10 @@ function CandidateInput() {
 							Add
 						</Button>
 					</MultipleItemInputContainer>
-				</InputContainer>
+				</Card>
 
-				<InputContainer>
-					<CategoryTitle>Experience</CategoryTitle>
+				<Card>
+					<CardTitle>Experience</CardTitle>
 
 					{experience.map(
 						({ jobTitle, company, summary, fromDate, tillDate }) => {
@@ -271,38 +278,40 @@ function CandidateInput() {
 						}
 					)}
 
-					<StyledTextField
+					<SMUITextField
 						value={jobTitle}
 						onChange={(e) => setJobTitle(e.target.value)}
 						label='Job Title'
 					/>
-					<StyledTextField
+					<SMUITextField
 						value={company}
 						onChange={(e) => setCompany(e.target.value)}
 						label='Company'
 					/>
-					<StyledTextField
+					<SMUITextField
 						value={summary}
 						onChange={(e) => setSummary(e.target.value)}
 						label='Summary'
 					/>
-					<input
+					<SMUITextField
 						type='date'
 						value={fromDate}
 						onChange={(e) => setFromDate(e.target.value)}
 					/>
-					<input
+					<SMUITextField
 						type='date'
 						value={tillDate}
 						onChange={(e) => setTillDate(e.target.value)}
 					/>
-					<Button onClick={addExpHandler} variant='contained' color='primary'>
-						Add
-					</Button>
-				</InputContainer>
-
-				<InputContainer>
-					<CategoryTitle>Education</CategoryTitle>
+					<IconButton
+						onClick={addExpHandler}
+						variant='contained'
+						color='primary'>
+						<AddCircleIcon />
+					</IconButton>
+				</Card>
+				<Card>
+					<CardTitle>Education</CardTitle>
 
 					{education.map(
 						({
@@ -326,32 +335,35 @@ function CandidateInput() {
 							)
 						}
 					)}
-					<StyledTextField
+					<SMUITextField
 						value={qualificationName}
 						onChange={(e) => setQualificationName(e.target.value)}
 						label='Qualification Name'
 					/>
-					<StyledTextField
+					<SMUITextField
 						value={instituteName}
 						onChange={(e) => setInstituteName(e.target.value)}
 						label='Institute Name'
 					/>
-					<input
+					<SMUITextField
 						type='date'
 						value={studiedFromDate}
 						onChange={(e) => setStudiedFromDate(e.target.value)}
 					/>
-					<input
+					<SMUITextField
 						type='date'
 						value={studiedTillDate}
 						onChange={(e) => setStudiedTillDate(e.target.value)}
 					/>
-					<Button onClick={addEduHandler} variant='contained' color='primary'>
-						Add
-					</Button>
-				</InputContainer>
-			</Card>
-		</div>
+					<IconButton
+						onClick={addEduHandler}
+						variant='contained'
+						color='primary'>
+						<AddCircleIcon />
+					</IconButton>
+				</Card>
+			</ContentContainer>
+		</>
 	)
 }
 

@@ -1,18 +1,13 @@
 import { Checkbox } from '@material-ui/core'
 import React from 'react'
 import styled from 'styled-components'
-import { themeBorder, TableHead } from '../../styles'
+import { themeBorder, TableHead, StyledCheckbox } from '../../styles'
 
 function Table({ headings, children }) {
 	return (
 		<TableContainer>
 			<TableHeadContainer>
-				<TableHeadingRow>
-					<TableHead>
-						<Checkbox color='primary' />
-					</TableHead>
-					{headings}
-				</TableHeadingRow>
+				<TableHeadingRow>{headings}</TableHeadingRow>
 			</TableHeadContainer>
 			<TableBody>{children}</TableBody>
 		</TableContainer>
@@ -34,6 +29,7 @@ const TableContainer = styled.table`
 	border-collapse: collapse;
 	overflow: scroll;
 	${themeBorder};
+	box-shadow: 3px 3px 5px 0px #00000017;
 `
 
 const TableBody = styled.tbody``

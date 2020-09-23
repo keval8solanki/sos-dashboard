@@ -17,7 +17,10 @@ import {
 } from '@material-ui/pickers'
 import {
 	Card,
+	CardTitle,
 	CategoryTitle,
+	ContentContainer,
+	ControlButton,
 	InputContainer,
 	ItemList,
 	ItemListContainer,
@@ -32,6 +35,7 @@ import {
 } from '../../../utils/helperFunctions'
 import Axios from 'axios'
 import { createJob } from '../../../api'
+import { SMUISelect, SMUITextField } from '../../../styles/StyledMaterialUI'
 
 function JobInput() {
 	// jobopeninginfo
@@ -117,90 +121,77 @@ function JobInput() {
 		<JobInputContainer>
 			{/* Control */}
 			<Controls title='Job Control'>
-				<Button color='secondary'>Reset</Button>
-				<Button variant='contained' color='primary' onClick={saveHandler}>
+				<ControlButton color='secondary'>Reset</ControlButton>
+				<ControlButton
+					variant='contained'
+					color='primary'
+					onClick={saveHandler}>
 					Save
-				</Button>
+				</ControlButton>
 			</Controls>
+			<ContentContainer>
+				<Card>
+					<CardTitle>Job Opening Info</CardTitle>
 
-			<Card>
-				<InputContainer>
-					<CategoryTitle>Job Opening Info</CategoryTitle>
-
-					<StyledTextField
+					<SMUITextField
 						value={jobTitle}
 						onChange={(e) => setJobTitle(e.target.value)}
 						label='Job Title'
 					/>
 
-					<InputLabel id='demo-simple-select-label'>Job Type</InputLabel>
-					<Select
-						value={jobType}
-						onChange={(e) => setJobType(e.target.value)}
-						id='demo-simple-select'
-						labelId='demo-simple-select-label'>
-						<MenuItem value='Full-time'>Full-Time</MenuItem>
-						<MenuItem value='Part-time'>Part-time</MenuItem>
-						<MenuItem value='Freelancing'>Part-time</MenuItem>
-					</Select>
-					<StyledTextField
+					<SMUITextField
 						value={industry}
 						onChange={(e) => setIndustry(e.target.value)}
 						label='Industry'
 					/>
-					<StyledTextField
+					<SMUITextField
 						value={noOfOpening}
 						onChange={(e) => setNoOfOpening(e.target.value)}
 						type='number'
 						label='No. of Opening'
 					/>
-				</InputContainer>
+					<SMUISelect
+						value={jobType}
+						onChange={(e) => setJobType(e.target.value)}>
+						<MenuItem value='Full-time'>Full-Time</MenuItem>
+						<MenuItem value='Part-time'>Part-time</MenuItem>
+						<MenuItem value='Freelancing'>Part-time</MenuItem>
+					</SMUISelect>
+				</Card>
 
-				<InputContainer>
-					<CategoryTitle>Company Details</CategoryTitle>
-					<StyledTextField
-						value={companyName}
-						onChange={(e) => setCompanyName(e.target.value)}
-						label='Company Name'
-					/>
-					<StyledTextField
-						value={companyAddress}
-						multiline
-						rows={4}
-						rowsMax={4}
-						onChange={(e) => setCompanyAddress(e.target.value)}
-						label='Company Address'
-					/>
-					<Checkbox
-						value={isCompanyDetailsVisible}
-						onChange={(e) => setIsCompanyDetailsVisible((prev) => !prev)}
-						aria-label='Visible'
-						defaultChecked
-						color='primary'
-						inputProps={{ 'aria-label': 'secondary checkbox' }}
-					/>
-				</InputContainer>
+				<Card>
+					<CardTitle>Job Address</CardTitle>
 
-				<InputContainer>
-					<CategoryTitle>Job Address</CategoryTitle>
-					<InputLabel id='demo-simple-select-label'>Job Location</InputLabel>
-					<Select
+					<SMUITextField
+						value={city}
+						onChange={(e) => setCity(e.target.value)}
+						label='City'
+					/>
+
+					<SMUITextField
+						value={state}
+						onChange={(e) => setState(e.target.value)}
+						label='State'
+					/>
+					<SMUITextField
+						value={pincode}
+						onChange={(e) => setPincode(e.target.value)}
+						label='Pincode'
+					/>
+					<SMUITextField
+						value={country}
+						onChange={(e) => setCountry(e.target.value)}
+						label='Country'
+					/>
+					<SMUISelect
 						value={jobLocation}
 						onChange={(e) => setJobLocation(e.target.value)}
 						id='demo-simple-select'
 						labelId='demo-simple-select-label'>
 						<MenuItem value='On Location'>On Location</MenuItem>
 						<MenuItem value='Remote'>Remote</MenuItem>
-					</Select>
-
-					<StyledTextField
-						value={city}
-						onChange={(e) => setCity(e.target.value)}
-						label='City'
-					/>
-
-					<InputLabel id='demo-simple-select-label'>Job Location</InputLabel>
-					<Select
+					</SMUISelect>
+					<SMUISelect
 						value={zone}
 						onChange={(e) => setJobLocation(e.target.value)}
 						id='demo-simple-select'
@@ -213,27 +204,10 @@ function JobInput() {
 						<MenuItem value='North-West'>North-West</MenuItem>
 						<MenuItem value='South-East'>South-East</MenuItem>
 						<MenuItem value='South-West'>South-West</MenuItem>
-					</Select>
-
-					<StyledTextField
-						value={state}
-						onChange={(e) => setState(e.target.value)}
-						label='State'
-					/>
-					<StyledTextField
-						value={pincode}
-						onChange={(e) => setPincode(e.target.value)}
-						label='Pincode'
-					/>
-					<StyledTextField
-						value={country}
-						onChange={(e) => setCountry(e.target.value)}
-						label='Country'
-					/>
-				</InputContainer>
-
-				<InputContainer>
-					<CategoryTitle>Job Details</CategoryTitle>
+					</SMUISelect>
+				</Card>
+				<Card>
+					<CardTitle>Job Details</CardTitle>
 
 					{eligibility.length > 0 && (
 						<ItemListContainer>
@@ -245,7 +219,7 @@ function JobInput() {
 						onSubmit={(e) =>
 							addValToArr(e, eligibilityVal, eligibility, setEligibility)
 						}>
-						<StyledTextField
+						<SMUITextField
 							value={eligibilityVal}
 							onChange={(e) => setEligibilityVal(e.target.value)}
 							label='Eligibility'
@@ -269,7 +243,7 @@ function JobInput() {
 								setResponsibilities
 							)
 						}>
-						<StyledTextField
+						<SMUITextField
 							label='Responsibilities'
 							value={responsibilitiesVal}
 							onChange={(e) => setResponsibilitiesVal(e.target.value)}
@@ -288,7 +262,7 @@ function JobInput() {
 						onSubmit={(e) =>
 							addValToArr(e, benefitsVal, benefits, setBenefits)
 						}>
-						<StyledTextField
+						<SMUITextField
 							label='Benefits'
 							value={benefitsVal}
 							onChange={(e) => setBenefitsVal(e.target.value)}
@@ -298,7 +272,7 @@ function JobInput() {
 						</Button>
 					</MultipleItemInputContainer>
 
-					<StyledTextField
+					<SMUITextField
 						multiline
 						rows={4}
 						rowsMax={4}
@@ -307,7 +281,7 @@ function JobInput() {
 						label='Job Description'
 					/>
 
-					<StyledTextField
+					<SMUITextField
 						multiline
 						rows={4}
 						rowsMax={4}
@@ -321,8 +295,8 @@ function JobInput() {
 						type='date'
 						placeholder='Target Date'
 					/>
-				</InputContainer>
-			</Card>
+				</Card>
+			</ContentContainer>
 
 			{/* inputs */}
 		</JobInputContainer>

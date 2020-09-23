@@ -26,10 +26,18 @@ export const MultipleItemInputContainer = styled.form`
 
 export const Card = styled.div`
 	padding: 10px 20px;
-	border-radius: 3px;
-	border: 1px solid #0000003b;
+	/* border-radius: 3px; */
+	/* border: 1px solid #0000003b; */
 	background-color: white;
 	margin-bottom: 10px;
+	box-shadow: 3px 3px 5px 0px #00000017;
+`
+
+export const CardTitle = styled.h5`
+	text-align: left;
+	color: #333;
+	${RemoveSpaces};
+	padding: 5px 0px;
 `
 
 export const StyledNavlink = styled(NavLink)`
@@ -134,4 +142,21 @@ export const DataContent = styled.p`
 
 export const ContentContainer = styled.div`
 	padding: 10px;
+`
+
+export const IconButton = styled.img`
+	width: 28px;
+	cursor: pointer;
+`
+
+export const ControlButton = styled(Button)`
+	&& {
+		margin: 5px;
+		padding: 2px 10px;
+	}
+`
+
+export const StyledCheckbox = styled.input`
+	width: 18px;
+	height: 18px;
 `

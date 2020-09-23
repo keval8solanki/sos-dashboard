@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Sidebar from './components/Sidebar'
@@ -19,8 +20,11 @@ import Signin from './pages/Signin'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { credentialAtom, isAuthAtom } from './recoil/atoms'
 import Navbar from './components/Navbar'
+import AddRole from './pages/Role/AddRole'
+import AddUser from './pages/User/AddUser'
 
 function App() {
+	
 	const [isAuth, setIsAuth] = useRecoilState(isAuthAtom)
 	const cred = useRecoilValue(credentialAtom)
 	useEffect(() => {
@@ -30,6 +34,8 @@ function App() {
 		}
 	}, [cred])
 
+	
+
 	const routes = (
 		<Switch>
 			<Route path='/' exact component={DashboardPage} />
@@ -37,14 +43,20 @@ function App() {
 			<Route path='/job/apply' component={ApplyJobList} />
 			<Route path='/job/:id' component={JobDetails} />
 			<Route path='/job' component={JobPage} />
+
 			<Route path='/candidate/add' component={AddCandidate} />
 			<Route path='/candidate/:id' component={CandidateDetails} />
 			<Route path='/candidate' component={CandidatePage} />
+
 			<Route path='/company/add' component={AddCompany} />
 			<Route path='/company' component={CompanyPage} />
 
+			<Route path='/role/add' component={AddRole} />
 			<Route path='/role' component={RolePage} />
+
+			<Route path='/user/add' component={AddUser} />
 			<Route path='/user' component={UserPage} />
+
 			<Route path='/profile' component={ProfilePage} />
 		</Switch>
 	)

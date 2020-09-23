@@ -1,6 +1,7 @@
 import React from 'react'
 import Loader from '../components/Loader'
 import { ItemList } from '../styles'
+import cryptojs from 'crypto-js'
 
 export const codeGenerator = (field1, field2, field3) => {
 	//Helper Function
@@ -64,8 +65,9 @@ export const renderArr = (data, setData) =>
 	))
 
 export const trueKeysToArr = (obj) => {
+	console.log(obj)
 	const ids = Object.keys(obj)
-	return ids.filter((id) => obj[id])
+	return ids.filter((id) => obj[id] === true)
 }
 
 export const titleGenerator = (arr, title) => {
@@ -77,4 +79,13 @@ export const titleGenerator = (arr, title) => {
 	}
 }
 
-export const renderWithLoader = (val, component) =>val ? component : <Loader />
+export const renderWithLoader = (val, component) =>
+	val ? component : <Loader />
+
+export const encryptObj = (obj) => {
+	const objStr = JSON.stringify(obj)
+	return cryptojs.AES.encrypt(
+		objStr,
+		process.env.REACT_APP_ENCRYPTION_SECRET_KEY
+	).toString()
+}
