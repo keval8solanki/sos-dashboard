@@ -22,13 +22,14 @@ const TableHeadingRow = styled.tr`
 `
 
 const TableContainer = styled.table`
+	padding: 5px;
 	border: 0;
 	width: 100%;
 	background-color: white;
 	/* box-shadow: 2px 3px 20px 0px #00000017; */
-	border-collapse: collapse;
+	/* border-collapse: collapse; */
 	overflow: scroll;
-	${themeBorder};
+	/* ${themeBorder}; */
 	box-shadow: 3px 3px 5px 0px #00000017;
 `
 

@@ -2,12 +2,13 @@ import 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
 import {
 	Button,
+	IconButton,
 	InputLabel,
 	MenuItem,
 	Select,
 	TextField,
 } from '@material-ui/core'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Controls from '../../../components/Controls'
 import Checkbox from '@material-ui/core/Checkbox'
@@ -25,6 +26,8 @@ import {
 	ItemList,
 	ItemListContainer,
 	MultipleItemInputContainer,
+	RemoveSpaces,
+	StyledCheckbox,
 	StyledTextField,
 } from '../../../styles'
 import {
@@ -34,49 +37,101 @@ import {
 	renderArr,
 } from '../../../utils/helperFunctions'
 import Axios from 'axios'
-import { createJob } from '../../../api'
-import { SMUISelect, SMUITextField } from '../../../styles/StyledMaterialUI'
+import { companiesEndpoint, createJob, jobEndpoint } from '../../../api'
+import {
+	SMUIFormControl,
+	SMUISelect,
+	SMUITextField,
+} from '../../../styles/StyledMaterialUI'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { companyAtom, currentUserAtom, jobAtom } from '../../../recoil/atoms'
+import { NavLink, useHistory, useLocation } from 'react-router-dom'
+import { AddCircle } from '@material-ui/icons'
+import { get } from 'lodash'
 
-function JobInput() {
-	// jobopeninginfo
-	const [jobTitle, setJobTitle] = useState('')
-	const [jobType, setJobType] = useState('Full-time')
-	const [industry, setIndustry] = useState('')
-	const [noOfOpening, setNoOfOpening] = useState()
+function JobInput({ edit, match }) {
+	const history = useHistory()
+	const jobId = get(match, 'params.id', '')
+	const [companies, setCompanies] = useRecoilState(companyAtom)
+	const jobs = useRecoilValue(jobAtom)
+	const currentUser = useRecoilValue(currentUserAtom)
+	const [job, setJob] = useState(
+		jobs && jobs.find((job) => job.jobDetails.jobCode === jobId)
+	)
+	console.log({ job })
+	useEffect(() => {
+		if (!job) {
+			Axios.get(`${jobEndpoint}/${jobId}`)
+				.then(({ data }) => setJob(data))
+				.catch((e) => console.log(e))
+		}
+	}, [])
+
+	const [jobTitle, setJobTitle] = useState(
+		get(job, 'jobOpeningInfo.jobTitle', '')
+	)
+	const [jobType, setJobType] = useState(get(job, 'jobOpeningInfo.jobType', ''))
+	const [industry, setIndustry] = useState(
+		get(job, 'jobOpeningInfo.industry', '')
+	)
+	const [noOfOpening, setNoOfOpening] = useState(
+		get(job, 'jobOpeningInfo.noOfOpenings')
+	)
 
 	//companydetails
-	const [companyName, setCompanyName] = useState('')
-	const [companyAddress, setCompanyAddress] = useState('')
-	const [isCompanyDetailsVisible, setIsCompanyDetailsVisible] = useState(true)
-	console.log(isCompanyDetailsVisible)
+	const [companyId, setCompanyId] = useState(
+		get(job, 'companyDetails.companyId', '')
+	)
+
+	const [isCompanyDetailsVisible, setIsCompanyDetailsVisible] = useState(
+		get(job, 'companyDetails.isCompanyDetailsVisible', true)
+	)
 	//jobaddress
-	const [jobLocation, setJobLocation] = useState('On Location')
-	const [city, setCity] = useState('')
-	const [zone, setZone] = useState('North')
-	const [state, setState] = useState('')
-	const [pincode, setPincode] = useState()
-	const [country, setCountry] = useState()
+	const [jobLocation, setJobLocation] = useState(
+		get(job, 'jobAddress.jobLocation')
+	)
+	const [city, setCity] = useState(get(job, 'jobAddress.city', ''))
+	const [zone, setZone] = useState(get(job, 'jobAddress.zone'))
+	const [state, setState] = useState(get(job, 'jobAddress.state', ''))
+	const [pincode, setPincode] = useState(get(job, 'jobAddress.pincode'))
+	const [country, setCountry] = useState(get(job, 'jobAddress.country', ''))
 
 	//jobdetails
-	const [jobDescription, setJobDescription] = useState('')
+	const [jobDescription, setJobDescription] = useState(
+		get(job, 'jobDetails.jobDescription', '')
+	)
 
-	const [eligibility, setEligibility] = useState([])
+	const [eligibility, setEligibility] = useState(
+		get(job, 'jobDetails.eligibility', [])
+	)
 	const [eligibilityVal, setEligibilityVal] = useState()
 
-	const [responsibilities, setResponsibilities] = useState([])
+	const [responsibilities, setResponsibilities] = useState(
+		get(job, 'jobDetails.responsibilities', [])
+	)
 	const [responsibilitiesVal, setResponsibilitiesVal] = useState()
 
-	const [benefits, setBenefits] = useState([])
+	const [benefits, setBenefits] = useState(get(job, 'jobDetails.benefits', []))
 	const [benefitsVal, setBenefitsVal] = useState()
 
-	const [additionalInformation, setAdditionalInformation] = useState()
-	const [targetDate, setTargetDate] = useState()
+	const [additionalInformation, setAdditionalInformation] = useState(
+		get(job, 'jobDetails.additionalInformation', '')
+	)
+	const [targetDate, setTargetDate] = useState(
+		get(job, 'jobDetails.targetDate')
+	)
+
+	useEffect(() => {
+		Axios.get(companiesEndpoint)
+			.then(({ data }) => setCompanies(data))
+			.catch((e) => console.log(e))
+	}, [])
 
 	//functions
 	const resetFields = () => {}
 
 	//handlers
-	const saveHandler = async () => {
+	const saveHandler = async (isEdit) => {
 		const newJobData = {
 			jobOpeningInfo: {
 				jobTitle,
@@ -86,8 +141,7 @@ function JobInput() {
 				noOfOpenings: Number(noOfOpening),
 			},
 			companyDetails: {
-				companyName,
-				companyAddress,
+				companyId,
 				isCompanyDetailsVisible,
 			},
 			jobAddress: {
@@ -99,7 +153,7 @@ function JobInput() {
 				country,
 			},
 			jobDetails: {
-				jobCode: codeGenerator(jobTitle, industry, companyName),
+				jobCode: codeGenerator(jobTitle, industry, companyId),
 				jobDescription,
 				additionalInformation,
 				targetDate,
@@ -107,14 +161,37 @@ function JobInput() {
 				responsibilities,
 				benefits,
 			},
+			source: currentUser._id,
 		}
 		console.log('Saving..')
+		console.log(newJobData)
 		try {
-			const { data } = await Axios.post(createJob, newJobData)
+			if (isEdit) {
+				const { data } = await Axios.patch(
+					`${jobEndpoint}/${jobId}`,
+					newJobData
+				)
+			} else {
+				const { data } = await Axios.post(jobEndpoint, newJobData)
+			}
 		} catch (err) {
 			alert(err)
 		}
 		console.log(newJobData)
+	}
+
+	const renderCompaniesOption =
+		companies &&
+		companies.map(({ _id, companyName }) => {
+			return (
+				<MenuItem key={_id} value={_id}>
+					{companyName}
+				</MenuItem>
+			)
+		})
+
+	const addCompanyHandler = () => {
+		history.push('/company/add')
 	}
 
 	return (
@@ -125,38 +202,65 @@ function JobInput() {
 				<ControlButton
 					variant='contained'
 					color='primary'
-					onClick={saveHandler}>
+					onClick={() => saveHandler(edit)}>
 					Save
 				</ControlButton>
 			</Controls>
 			<ContentContainer>
 				<Card>
 					<CardTitle>Job Opening Info</CardTitle>
-
 					<SMUITextField
+						variant='outlined'
 						value={jobTitle}
 						onChange={(e) => setJobTitle(e.target.value)}
 						label='Job Title'
 					/>
-
 					<SMUITextField
+						variant='outlined'
 						value={industry}
 						onChange={(e) => setIndustry(e.target.value)}
 						label='Industry'
 					/>
 					<SMUITextField
+						variant='outlined'
 						value={noOfOpening}
 						onChange={(e) => setNoOfOpening(e.target.value)}
 						type='number'
 						label='No. of Opening'
 					/>
-					<SMUISelect
-						value={jobType}
-						onChange={(e) => setJobType(e.target.value)}>
-						<MenuItem value='Full-time'>Full-Time</MenuItem>
-						<MenuItem value='Part-time'>Part-time</MenuItem>
-						<MenuItem value='Freelancing'>Part-time</MenuItem>
-					</SMUISelect>
+					<SMUIFormControl>
+						<InputLabel id='jobtype'>Job type</InputLabel>
+						<SMUISelect
+							// variant='outlined'
+							labelId='jobtype'
+							value={jobType}
+							onChange={(e) => setJobType(e.target.value)}>
+							<MenuItem value='Full-time'>Full-Time</MenuItem>
+							<MenuItem value='Part-time'>Part-time</MenuItem>
+							<MenuItem value='Freelancing'>Part-time</MenuItem>
+						</SMUISelect>
+					</SMUIFormControl>
+					<SMUIFormControl>
+						<InputLabel id='company'>Company</InputLabel>
+						<SMUISelect
+							labelId='company'
+							value={companyId}
+							onChange={(e) => setCompanyId(e.target.value)}>
+							{renderCompaniesOption}
+
+							<MenuItem value='add New' onClick={addCompanyHandler}>
+								+ Add New Company
+							</MenuItem>
+						</SMUISelect>
+					</SMUIFormControl>
+					<CheckBoxContainer>
+						<StyledCheckbox
+							checked={isCompanyDetailsVisible}
+							onChange={(e) => setIsCompanyDetailsVisible(e.target.checked)}
+							type='checkbox'
+						/>
+						<CheckBoxLabel>Company Details Visible</CheckBoxLabel>
+					</CheckBoxContainer>
 				</Card>
 
 				<Card>
@@ -183,28 +287,34 @@ function JobInput() {
 						onChange={(e) => setCountry(e.target.value)}
 						label='Country'
 					/>
-					<SMUISelect
-						value={jobLocation}
-						onChange={(e) => setJobLocation(e.target.value)}
-						id='demo-simple-select'
-						labelId='demo-simple-select-label'>
-						<MenuItem value='On Location'>On Location</MenuItem>
-						<MenuItem value='Remote'>Remote</MenuItem>
-					</SMUISelect>
-					<SMUISelect
-						value={zone}
-						onChange={(e) => setJobLocation(e.target.value)}
-						id='demo-simple-select'
-						labelId='demo-simple-select-label'>
-						<MenuItem value='North'>North</MenuItem>
-						<MenuItem value='East'>East</MenuItem>
-						<MenuItem value='West'>West</MenuItem>
-						<MenuItem value='South'>South</MenuItem>
-						<MenuItem value='North-East'>North-East</MenuItem>
-						<MenuItem value='North-West'>North-West</MenuItem>
-						<MenuItem value='South-East'>South-East</MenuItem>
-						<MenuItem value='South-West'>South-West</MenuItem>
-					</SMUISelect>
+					<SMUIFormControl>
+						<InputLabel id='jobLocation'>Job Location</InputLabel>
+						<SMUISelect
+							value={jobLocation}
+							onChange={(e) => setJobLocation(e.target.value)}
+							labelId='jobLocation'>
+							<MenuItem value='On Location'>On Location</MenuItem>
+							<MenuItem value='Remote'>Remote</MenuItem>
+						</SMUISelect>
+					</SMUIFormControl>
+
+					<SMUIFormControl>
+						<InputLabel id='zone'>Zone</InputLabel>
+
+						<SMUISelect
+							value={zone}
+							onChange={(e) => setZone(e.target.value)}
+							labelId='zone'>
+							<MenuItem value='North'>North</MenuItem>
+							<MenuItem value='East'>East</MenuItem>
+							<MenuItem value='West'>West</MenuItem>
+							<MenuItem value='South'>South</MenuItem>
+							<MenuItem value='North-East'>North-East</MenuItem>
+							<MenuItem value='North-West'>North-West</MenuItem>
+							<MenuItem value='South-East'>South-East</MenuItem>
+							<MenuItem value='South-West'>South-West</MenuItem>
+						</SMUISelect>
+					</SMUIFormControl>
 				</Card>
 				<Card>
 					<CardTitle>Job Details</CardTitle>
@@ -224,9 +334,9 @@ function JobInput() {
 							onChange={(e) => setEligibilityVal(e.target.value)}
 							label='Eligibility'
 						/>
-						<Button type='submit' variant='contained' color='primary'>
-							Add
-						</Button>
+						<IconButton type='submit' variant='contained' color='primary'>
+							<AddCircle />
+						</IconButton>
 					</MultipleItemInputContainer>
 
 					{responsibilities.length > 0 && (
@@ -248,9 +358,9 @@ function JobInput() {
 							value={responsibilitiesVal}
 							onChange={(e) => setResponsibilitiesVal(e.target.value)}
 						/>
-						<Button type='submit' variant='contained' color='primary'>
-							Add
-						</Button>
+						<IconButton type='submit' variant='contained' color='primary'>
+							<AddCircle />
+						</IconButton>
 					</MultipleItemInputContainer>
 
 					{benefits.length > 0 && (
@@ -267,12 +377,13 @@ function JobInput() {
 							value={benefitsVal}
 							onChange={(e) => setBenefitsVal(e.target.value)}
 						/>
-						<Button type='submit' variant='contained' color='primary'>
-							Add
-						</Button>
+						<IconButton type='submit' variant='contained' color='primary'>
+							<AddCircle />
+						</IconButton>
 					</MultipleItemInputContainer>
 
 					<SMUITextField
+						variant='outlined'
 						multiline
 						rows={4}
 						rowsMax={4}
@@ -282,6 +393,7 @@ function JobInput() {
 					/>
 
 					<SMUITextField
+						variant='outlined'
 						multiline
 						rows={4}
 						rowsMax={4}
@@ -289,12 +401,15 @@ function JobInput() {
 						onChange={(e) => setAdditionalInformation(e.target.value)}
 						label='Additional Information'
 					/>
-					<input
-						value={targetDate}
-						onChange={(e) => setTargetDate(e.target.value)}
-						type='date'
-						placeholder='Target Date'
-					/>
+
+					<SMUIFormControl>
+						<SMUITextField
+							value={targetDate}
+							onChange={(e) => setTargetDate(e.target.value)}
+							type='date'
+							placeholder='Target Date'
+						/>
+					</SMUIFormControl>
 				</Card>
 			</ContentContainer>
 
@@ -306,3 +421,15 @@ function JobInput() {
 export default JobInput
 
 const JobInputContainer = styled.div``
+
+const CheckBoxContainer = styled.div`
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+`
+const CheckBoxLabel = styled.p`
+	${RemoveSpaces}
+	padding-left: 5px;
+	font-size: 0.8em;
+	font-weight: 400;
+`

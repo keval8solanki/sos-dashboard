@@ -4,33 +4,57 @@ import styled from 'styled-components'
 import { RemoveSpaces, StyledTextField } from '../../../styles'
 import { Button, TextField } from '@material-ui/core'
 import { useRecoilState } from 'recoil'
-import { credentialAtom } from '../../../recoil/atoms'
+import {
+	credentialAtom,
+	currentUserAtom,
+	isAuthAtom,
+} from '../../../recoil/atoms'
 import { useHistory } from 'react-router-dom'
+import { loginEndpoint } from '../../../api'
+
+import Axios from 'axios'
+import { encryptObj } from '../../../utils/helperFunctions'
 
 function SigninForm() {
 	const history = useHistory()
-	const [cred, setCred] = useRecoilState(credentialAtom)
 
-	const [email, setEmail] = useState('')
+	const [user, setUser] = useState('')
 	const [password, setPassword] = useState('')
+	const [isAuth, setIsAuth] = useRecoilState(isAuthAtom)
+	const [currentUser, setCurrentUser] = useRecoilState(currentUserAtom)
 
-	const submitHandler = (e) => {
+	const submitHandler = async (e) => {
 		e.preventDefault()
-		setCred({ email, password })
-		history.push('/')
+		const cred = { user, password }
+		const data = encryptObj(cred)
+		try {
+			const resData = await Axios.post(
+				loginEndpoint,
+				{ data },
+				{ withCredentials: true }
+			)
+			console.log(resData)
+			if (resData.data.userData) {
+				setIsAuth(true)
+				setCurrentUser(resData.data.userData)
+			}
+		} catch (error) {
+			alert(error)
+		}
+		history.push('/dashboard')
 	}
-	console.log(cred)
+
 	return (
 		<SigninFormContainer onSubmit={submitHandler}>
 			<SiginFormTitle>SOS Dashboard</SiginFormTitle>
 			<SiginFormDesc>Welcome Back, Please enter your credentials</SiginFormDesc>
 			<SigninInput
 				required
-				value={email}
-				onChange={(e) => setEmail(e.target.value)}
-				label='Email'
+				value={user}
+				onChange={(e) => setUser(e.target.value)}
+				label='Email / Username'
 				variant='outlined'
-				type='email'
+				type='text'
 			/>
 			<SigninInput
 				required

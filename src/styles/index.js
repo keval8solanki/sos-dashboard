@@ -160,3 +160,35 @@ export const StyledCheckbox = styled.input`
 	width: 18px;
 	height: 18px;
 `
+
+// Modal
+
+export const ModalBody = styled.div`
+	background-color: white;
+	padding: 20px;
+	border-radius: 5px;
+`
+export const ModalTitle = styled.h4`
+	${RemoveSpaces};
+	padding-bottom: 10px;
+`
+
+export const ModalWarning = styled.p`
+	${RemoveSpaces}
+	padding: 10px;
+	font-weight: bold;
+	border: 2px solid red;
+	border-radius: 5px;
+	border-left: 10px solid red;
+`
+
+export const ModalText = styled.p`
+	${RemoveSpaces};
+	padding-top: 10px;
+`
+
+export const ModalButtonContainer = styled.div`
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 20px;
+`

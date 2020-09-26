@@ -6,6 +6,11 @@ import {
 	TableData,
 	TableRow,
 	RemoveSpaces,
+	ModalBody,
+	ModalTitle,
+	ModalWarning,
+	ModalText,
+	ModalButtonContainer,
 } from '../../styles'
 import Controls from '../../components/Controls'
 import { Button, IconButton } from '@material-ui/core'
@@ -16,12 +21,13 @@ import Axios from 'axios'
 import { companiesEndpoint } from '../../api'
 import { v4 as uuid } from 'uuid'
 import Table from '../../components/Table'
-import { renderWithLoader, trueKeysToArr } from '../../utils/helperFunctions'
+import { formatDate, renderWithLoader, trueKeysToArr } from '../../utils/helperFunctions'
 import { selectedCompanies } from '../../recoil/selectors'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
 import Modal from '@material-ui/core/Modal'
 import styled from 'styled-components'
+import { SMUIButton, SMUIModal } from '../../styles/StyledMaterialUI'
 
 function CompanyPage() {
 	const history = useHistory()
@@ -33,8 +39,6 @@ function CompanyPage() {
 
 	const selectedCompany = useRecoilValue(selectedCompanies)
 
-	console.log(selectedCompany)
-	console.log(companies)
 	useEffect(() => {
 		Axios.get(companiesEndpoint)
 			.then(({ data }) => setCompanies(data))
@@ -47,7 +51,13 @@ function CompanyPage() {
 
 	const selectAllHandler = () => {}
 
-	const companyHeading = ['Company Name', 'Company Address']
+	const companyHeading = [
+		'Select',
+		'Company Name',
+		'Company Address',
+		'Jobs Assigned',
+		'Created On',
+	]
 
 	const renderCompanyHeading = companyHeading.map((heading) => (
 		<TableHead key={uuid()}>{heading}</TableHead>
@@ -85,7 +95,7 @@ function CompanyPage() {
 
 	const renderCompanyData =
 		companies &&
-		companies.map(({ _id, companyName, companyAddress }) => {
+		companies.map(({ _id, companyName, companyAddress, jobIds, createdAt }) => {
 			return (
 				<TableRow key={_id}>
 					<TableData>
@@ -98,6 +108,8 @@ function CompanyPage() {
 
 					<TableData>{companyName}</TableData>
 					<TableData>{companyAddress}</TableData>
+					<TableData>{jobIds.length}</TableData>
+					<TableData>{formatDate(createdAt)}</TableData>
 				</TableRow>
 			)
 		})
@@ -115,28 +127,26 @@ function CompanyPage() {
 					</IconButton>
 				)}
 			</Controls>
-			<StyledModal open={isModalOpen} onClose={toggleModal}>
+			<SMUIModal open={isModalOpen} onClose={toggleModal}>
 				<ModalBody>
 					<ModalTitle>{selectedCompany.length} Items Selected</ModalTitle>
 					<ModalWarning>Warning: This action cannot be undone</ModalWarning>
 					<ModalText>Do you want to delete?</ModalText>
 					<ModalButtonContainer>
-						<StyledButton onClick={toggleModal}>Cancel</StyledButton>
-						<StyledButton
+						<SMUIButton onClick={toggleModal}>Cancel</SMUIButton>
+						<SMUIButton
 							onClick={deleteManyHandler}
 							color='secondary'
 							variant='contained'>
 							Delete
-						</StyledButton>
+						</SMUIButton>
 					</ModalButtonContainer>
 				</ModalBody>
-			</StyledModal>
+			</SMUIModal>
 			<ContentContainer>
 				{renderWithLoader(
 					companies,
-					<Table headings={companyHeadingWithCheckbox}>
-						{renderCompanyData}
-					</Table>
+					<Table headings={renderCompanyHeading}>{renderCompanyData}</Table>
 				)}
 			</ContentContainer>
 		</>
@@ -144,56 +154,3 @@ function CompanyPage() {
 }
 
 export default CompanyPage
-
-const StyledModal = styled(Modal)`
-	&& {
-		position: fixed;
-		top: 60px;
-		left: auto;
-		margin: 0 auto;
-		right: auto;
-		width: 500px;
-		outline: none;
-		border-style: none;
-	}
-	&&:focus {
-		outline: none;
-	}
-`
-
-const StyledButton = styled(Button)`
-	&& {
-		margin: 10px;
-		padding: 5px 20px;
-	}
-`
-
-const ModalBody = styled.div`
-	background-color: white;
-	padding: 20px;
-	border-radius: 5px;
-`
-const ModalTitle = styled.h4`
-	${RemoveSpaces};
-	padding-bottom: 10px;
-`
-
-const ModalWarning = styled.p`
-	${RemoveSpaces}
-	padding: 10px;
-	font-weight: bold;
-	border: 2px solid red;
-	border-radius: 5px;
-	border-left: 10px solid red;
-`
-
-const ModalText = styled.p`
-	${RemoveSpaces};
-	padding-top: 10px;
-`
-
-const ModalButtonContainer = styled.div`
-	display: flex;
-	justify-content: flex-end;
-	margin-top: 20px;
-`

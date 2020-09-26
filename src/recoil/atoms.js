@@ -76,5 +76,10 @@ export const credentialAtom = atom({
 
 export const isAuthAtom = atom({
 	key: 'isAuth',
-	default: true,
+	default: false,
+})
+
+export const currentUserAtom = atom({
+	key: 'currentUser',
+	default: null
 })

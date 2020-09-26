@@ -2,52 +2,56 @@ import Axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import styled from 'styled-components'
-import {
-	applyJob,
-	deleteJob,
-	deleteJobs,
-	deleteManyJobs,
-	getJobs,
-} from '../../api'
+import { applyJob, deleteJobs, getJobs } from '../../api'
 import Table from '../../components/Table'
 import {
 	candidateCheckedAtom,
+	currentUserAtom,
 	jobAtom,
 	jobCheckedAtom,
 } from '../../recoil/atoms'
 import {
-	IconButton,
 	ContentContainer,
-	PageLayout,
-	StyledButton,
 	TableData,
 	TableHead,
 	TableRow,
+	StyledCheckbox,
+	ControlButton,
 } from '../../styles'
-import TableComponent from '../../components/TableComponent'
-import Checkbox from '@material-ui/core/Checkbox'
 import { NavLink, useHistory, useLocation } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import Controls from '../../components/Controls'
-import { Button } from '@material-ui/core'
-import { titleGenerator, renderWithLoader } from '../../utils/helperFunctions'
+import {
+	titleGenerator,
+	renderWithLoader,
+	formatDate,
+} from '../../utils/helperFunctions'
 import {
 	filterTrueCandidateChecked,
 	filterTrueJobChecked,
 } from '../../recoil/selectors'
-import SearchBar from '../../components/SearchBar'
 import AddIcon from '../../assets/icons/add.svg'
+import DeleteModal from '../../components/Modals/DeleteModal'
+import { IconButton } from '@material-ui/core'
+import { AddCircle, Delete } from '@material-ui/icons'
 
 function JobPage({ toApply }) {
-	
 	// React Hooks
 	const history = useHistory()
 	const location = useLocation().pathname
 	const [jobData, setJobData] = useRecoilState(jobAtom)
-	console.log(jobData)
+	console.log({ jobData })
 	const [checked, setChecked] = useRecoilState(jobCheckedAtom)
+	const [candidateChecked, setCandidateChecked] = useRecoilState(
+		candidateCheckedAtom
+	)
 	const ids = useRecoilValue(filterTrueJobChecked)
 	const candidateSelectedIds = useRecoilValue(filterTrueCandidateChecked)
+	const currentUser = useRecoilValue(currentUserAtom)
+
+	const [isModalOpen, setIsModalOpen] = useState(false)
+
+	const toggleModal = () => setIsModalOpen(!isModalOpen)
 
 	useEffect(() => {
 		Axios.get(getJobs)
@@ -55,9 +59,10 @@ function JobPage({ toApply }) {
 				setJobData(data)
 			})
 			.catch((e) => console.log(e))
-	}, [checked])
+	}, [checked, isModalOpen])
 
 	// Variables
+
 	const jobHeading = [
 		'Select',
 		'Job Code',
@@ -67,7 +72,7 @@ function JobPage({ toApply }) {
 		'Openings',
 		`Resumes`,
 		`Posted On`,
-		`Assigned On`,
+		// `Assigned On`,
 	]
 
 	// Helper Functions
@@ -84,6 +89,8 @@ function JobPage({ toApply }) {
 
 		try {
 			await Axios.patch(deleteJobs, { ids })
+			toggleModal()
+			setChecked({})
 		} catch (err) {
 			console.log(err)
 			alert(err)
@@ -97,11 +104,19 @@ function JobPage({ toApply }) {
 			await Axios.post(applyJob, {
 				candidates: candidateSelectedIds,
 				jobs: ids,
-				userId: '5f647ab5a39e2d43e85044a0',
+				userId: currentUser._id,
 			})
+			setChecked({})
+			setCandidateChecked({})
+
+			history.push('/candidate')
 		} catch (err) {
 			console.log(err)
 		}
+	}
+
+	const assignJobHandler = () => {
+		history.push('/candidate')
 	}
 
 	// Renderers
@@ -119,27 +134,32 @@ function JobPage({ toApply }) {
 					}}
 					key={job._id}>
 					<TableData>
-						<Checkbox
-							value={checked[job._id]}
+						<StyledCheckbox
+							type='checkbox'
+							checked={checked[job._id]}
 							color='primary'
 							onChange={() => onCheckHandler(job._id)}
 						/>
 					</TableData>
 
 					<TableData>
-						<NavLink to={`${location}/${job.jobDetails.jobCode}`}>
-							{job.jobDetails.jobCode}
-						</NavLink>
+						{toApply ? (
+							job.jobDetails.jobCode
+						) : (
+							<NavLink to={`${location}/${job.jobDetails.jobCode}`}>
+								{job.jobDetails.jobCode}
+							</NavLink>
+						)}
 					</TableData>
 					<TableData>{job.jobOpeningInfo.jobTitle}</TableData>
-					<TableData>{job.companyDetails.companyName}</TableData>
+					<TableData>{job.companyDetails.companyId.companyName}</TableData>
 					<TableData>{job.jobAddress.city}</TableData>
 					<TableData>{job.jobOpeningInfo.noOfOpenings}</TableData>
-					<TableData>45</TableData>
-					<TableData>{new Date(job.createdAt).toDateString()}</TableData>
-					<TableData>
+					<TableData>{job.statusIds.length}</TableData>
+					<TableData>{formatDate(job.createdAt)}</TableData>
+					{/* <TableData>
 						{new Date(job.jobOpeningInfo.assignedOn).toDateString()}
-					</TableData>
+					</TableData> */}
 				</TableRow>
 			)
 		})
@@ -148,35 +168,38 @@ function JobPage({ toApply }) {
 		history.push(`${location}/add`)
 	}
 
-	const options = [
-		{ value: 'jobCode', name: 'Job Code' },
-		{ value: 'jobTitle', name: 'Job Title' },
-		{ value: 'company', name: 'company' },
-		{ value: 'city', name: 'City' },
-		{ value: 'noOfOpening', name: 'Openings' },
-		{ value: 'noOfResume', name: 'Resume' },
-	]
 	return (
 		<>
 			<Controls title={titleGenerator(ids, 'Jobs')}>
 				{ids.length > 0 ? (
 					<>
-						<Button onClick={deleteHandler} color='secondary'>
-							Delete
-						</Button>
-
-						<Button onClick={candidateApplyHandler} color='secondary'>
-							Apply
-						</Button>
+						{toApply ? (
+							<ControlButton
+								onClick={candidateApplyHandler}
+								variant='contained'
+								color='primary'>
+								Apply
+							</ControlButton>
+						) : (
+							<IconButton onClick={toggleModal}>
+								<Delete />
+							</IconButton>
+						)}
 					</>
 				) : (
-					// <Button onClick={addHandler} variant='contained' color='primary'>
-					// 	Add
-					// </Button>
-
-					<IconButton onClick={addHandler} src={AddIcon} />
+					<IconButton onClick={addHandler}>
+						<AddCircle />
+					</IconButton>
 				)}
 			</Controls>
+
+			<DeleteModal
+				open={isModalOpen}
+				onClose={toggleModal}
+				count={ids.length}
+				deleteHandler={deleteHandler}
+			/>
+
 			<ContentContainer>
 				{renderWithLoader(
 					jobData,

@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Sidebar from './components/Sidebar'
-import { HashRouter, Switch, Route } from 'react-router-dom'
+import { HashRouter, Switch, Route, useHistory } from 'react-router-dom'
 import DashboardPage from './pages/Dashboard'
 import JobPage from './pages/Job/JobPage'
 import CandidatePage from './pages/Candidate'
@@ -18,29 +17,38 @@ import CompanyPage from './pages/Company'
 import AddCompany from './pages/Company/AddCompany'
 import Signin from './pages/Signin'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { credentialAtom, isAuthAtom } from './recoil/atoms'
+import { credentialAtom, currentUserAtom, isAuthAtom } from './recoil/atoms'
 import Navbar from './components/Navbar'
 import AddRole from './pages/Role/AddRole'
 import AddUser from './pages/User/AddUser'
+import EditJob from './pages/Job/EditJob'
+import Axios from 'axios'
+import { verifyEndpoint } from './api'
 
 function App() {
-	
-	const [isAuth, setIsAuth] = useRecoilState(isAuthAtom)
-	const cred = useRecoilValue(credentialAtom)
-	useEffect(() => {
-		const { email, password } = cred
-		if (email === 'k@g.com' && password === 'hello') {
-			setIsAuth(true)
-		}
-	}, [cred])
+	const [isAuth, setAuth] = useRecoilState(isAuthAtom)
+	const [currentUser, setCurrentUser] = useRecoilState(currentUserAtom)
 
-	
+	// const cred = useRecoilValue(credentialAtom)
+
+	useEffect(() => {
+		Axios.post(verifyEndpoint, {}, { withCredentials: true })
+			.then(({ data }) => {
+				setAuth(true)
+				setCurrentUser(data.userData)
+			})
+			.catch((e) => {
+				setAuth(false)
+				setCurrentUser(null)
+			})
+	}, [])
 
 	const routes = (
 		<Switch>
-			<Route path='/' exact component={DashboardPage} />
+			<Route path='/dashboard' exact component={DashboardPage} />
 			<Route path='/job/add' component={AddJob} />
 			<Route path='/job/apply' component={ApplyJobList} />
+			<Route path='/job/edit/:id' component={EditJob} />
 			<Route path='/job/:id' component={JobDetails} />
 			<Route path='/job' component={JobPage} />
 
@@ -73,7 +81,7 @@ function App() {
 						</Layout>
 					</>
 				) : (
-					<Signin />
+					<Route path='/' exact component={Signin} />
 				)}
 			</HashRouter>
 		</AppContainer>

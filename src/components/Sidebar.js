@@ -15,7 +15,7 @@ function Sidebar() {
 	const sidebarData = [
 		{
 			icon: DashboardIcon,
-			linkTo: '/',
+			linkTo: '/dashboard',
 			text: 'Dashboard',
 		},
 		{

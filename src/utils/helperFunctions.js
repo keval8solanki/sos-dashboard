@@ -89,3 +89,22 @@ export const encryptObj = (obj) => {
 		process.env.REACT_APP_ENCRYPTION_SECRET_KEY
 	).toString()
 }
+
+export const formatDate = (date) => {
+	const dateArr = new Date(date).toDateString().split(' ')
+	dateArr.shift()
+	return dateArr.join(' ')
+}
+
+export const counter = (arr) => {
+	const countObj = {}
+	for (const item of arr) {
+		if (countObj[item]) {
+			countObj[item] += 1
+		} else {
+			countObj[item] = 1
+		}
+	}
+
+	return countObj
+}

@@ -1,9 +1,16 @@
 import styled from 'styled-components'
-import { Button, FormControl, Select, TextField } from '@material-ui/core'
+import {
+	Button,
+	FormControl,
+	Modal,
+	Select,
+	TextField,
+} from '@material-ui/core'
 
 export const SMUIButton = styled(Button)`
 	&& {
-		/* background-color: red; */
+		margin: 10px;
+		padding: 5px 20px;
 	}
 `
 export const SMUITextField = styled(TextField)`
@@ -26,5 +33,20 @@ export const SMUIFormControl = styled(FormControl)`
 		width: 100%;
 		/* margin: 10px 0px; */
 		text-align: left;
+	}
+`
+export const SMUIModal = styled(Modal)`
+	&& {
+		position: fixed;
+		top: 60px;
+		left: auto;
+		margin: 0 auto;
+		right: auto;
+		width: 500px;
+		outline: none;
+		border-style: none;
+	}
+	&&:focus {
+		outline: none;
 	}
 `

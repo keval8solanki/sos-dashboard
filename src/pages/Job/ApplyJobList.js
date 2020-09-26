@@ -1,5 +1,4 @@
 import React from 'react'
-import { PageLayout } from '../../styles'
 import JobPage from './JobPage'
 import styled from 'styled-components'
 function ApplyJobList() {

@@ -2,7 +2,13 @@ import Axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import styled from 'styled-components'
-import { applyJob, getCandidates, getJobs } from '../../api'
+import {
+	applyJob,
+	candidatesEndpoint,
+	companiesEndpoint,
+	getCandidates,
+	getJobs,
+} from '../../api'
 import Table from '../../components/Table'
 import { candidateAtom, candidateCheckedAtom } from '../../recoil/atoms'
 import {
@@ -10,13 +16,17 @@ import {
 	TableData,
 	TableHead,
 	TableRow,
-	IconButton,
+	
+	StyledCheckbox,
+	ContentContainer,
+	ControlButton,
 } from '../../styles'
 import Checkbox from '@material-ui/core/Checkbox'
 import Controls from '../../components/Controls'
-import { Button } from '@material-ui/core'
+import { IconButton } from '@material-ui/core'
 import { NavLink, useHistory, useLocation } from 'react-router-dom'
 import {
+	formatDate,
 	renderWithLoader,
 	titleGenerator,
 	trueKeysToArr,
@@ -25,14 +35,18 @@ import { useRecoilValue } from 'recoil'
 import { filterTrueCandidateChecked } from '../../recoil/selectors'
 import SearchBar from '../../components/SearchBar'
 import AddIcon from '../../assets/icons/add.svg'
-
+import DeleteModal from '../../components/Modals/DeleteModal'
+import { AddCircle, Delete } from '@material-ui/icons'
 
 function CandidatePage() {
 	// React Hooks
 
 	const [candidateData, setCandidateData] = useRecoilState(candidateAtom)
 	const [checked, setChecked] = useRecoilState(candidateCheckedAtom)
-	const ids = useRecoilValue(filterTrueCandidateChecked)
+	const selected = useRecoilValue(filterTrueCandidateChecked)
+
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const toggleModal = () => setIsModalOpen(!isModalOpen)
 
 	const history = useHistory()
 	const location = useLocation().pathname
@@ -41,7 +55,7 @@ function CandidatePage() {
 		Axios.get(getCandidates)
 			.then(({ data }) => setCandidateData(data))
 			.catch((e) => console.log(e))
-	}, [checked])
+	}, [checked, isModalOpen])
 
 	// Variables
 	const candidateHeading = [
@@ -51,9 +65,10 @@ function CandidatePage() {
 		'Email',
 		'Mobile',
 		'City',
-		`Experience`,
+		// `Experience`,
 		`Industry`,
 		`Functional Area`,
+		`Entered On`,
 	]
 
 	// Helper Functions
@@ -69,7 +84,15 @@ function CandidatePage() {
 		<TableHead>{heading}</TableHead>
 	))
 
-	const deleteHandler = () => {}
+	const deleteHandler = async () => {
+		try {
+			await Axios.patch(candidatesEndpoint, selected)
+			toggleModal()
+			setChecked({})
+		} catch (error) {
+			alert(error)
+		}
+	}
 
 	// const applyHandler = async () => {
 	// 	try {
@@ -90,7 +113,8 @@ function CandidatePage() {
 			return (
 				<TableRow key={candidate._id}>
 					<TableData>
-						<Checkbox
+						<StyledCheckbox
+							type='checkbox'
 							checked={checked[candidate._id]}
 							color='primary'
 							onChange={() => onCheckHandler(candidate._id)}
@@ -105,9 +129,10 @@ function CandidatePage() {
 					<TableData>{candidate.basic.primaryEmail}</TableData>
 					<TableData>{candidate.basic.mobile}</TableData>
 					<TableData>{candidate.address.state}</TableData>
-					<TableData>45</TableData>
+					{/* <TableData>45</TableData> */}
 					<TableData>{candidate.professional.industry}</TableData>
 					<TableData>{candidate.professional.functionalArea}</TableData>
+					<TableData>{formatDate(candidate.createdAt)}</TableData>
 				</TableRow>
 			)
 		})
@@ -116,37 +141,41 @@ function CandidatePage() {
 		history.push(link)
 	}
 
-	const options = [
-		{ value: 'candidateCode', name: 'Candidate Code' },
-		{ value: 'name', name: 'Name' },
-		{ value: 'primaryEmail', name: 'Email' },
-		{ value: 'mobile', name: 'Mobile' },
-		{ value: 'city', name: 'City' },
-		{ value: 'Industry', name: 'Experience' },
-		{ value: 'functionalArea', name: 'Functional Area' },
-	]
-
 	return (
 		<>
-			<Controls title={titleGenerator(ids, 'Candidate Controls')}>
-				{ids.length > 0 ? (
+			<Controls title={titleGenerator(selected, 'Candidate Controls')}>
+				{selected.length > 0 ? (
 					<>
-						<Button onClick={deleteHandler} color='secondary'>
-							Delete
-						</Button>
-						<Button onClick={() => toPage('/job/apply')}>Apply</Button>
+						<IconButton onClick={toggleModal} color='secondary'>
+							<Delete/>
+						</IconButton>
+						<ControlButton
+							variant='contained'
+							color='primary'
+							onClick={() => toPage('/job/apply')}>
+							Assign
+						</ControlButton>
 					</>
 				) : (
-					<IconButton onClick={() => toPage(`${location}/add`)} src={AddIcon} />
+						<IconButton onClick={() => toPage(`${location}/add`)} >
+							<AddCircle/>
+					</IconButton>
 				)}
 				{/* <Button variant="contained" color="primary">Import</Button>
 				<Button variant="contained" color="primary">Export</Button> */}
 			</Controls>
-
-			{renderWithLoader(
-				candidateData,
-				<Table headings={renderCandidateHeading}>{renderCandidateData}</Table>
-			)}
+			<DeleteModal
+				open={isModalOpen}
+				onClose={toggleModal}
+				count={selected.length}
+				deleteHandler={deleteHandler}
+			/>
+			<ContentContainer>
+				{renderWithLoader(
+					candidateData,
+					<Table headings={renderCandidateHeading}>{renderCandidateData}</Table>
+				)}
+			</ContentContainer>
 		</>
 	)
 }

@@ -22,8 +22,11 @@ import {
 
 import { SMUISelect, SMUITextField } from '../../../styles/StyledMaterialUI'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
+import { useRecoilValue } from 'recoil'
+import { currentUserAtom } from '../../../recoil/atoms'
 
 function CandidateInput() {
+	const currentUser = useRecoilValue(currentUserAtom)
 	// Basic
 	const [fullName, setFullName] = useState()
 	const [primaryEmail, setPrimaryEmail] = useState()
@@ -117,6 +120,7 @@ function CandidateInput() {
 				country,
 				pincode,
 			},
+			source: currentUser._id,
 		}
 
 		try {

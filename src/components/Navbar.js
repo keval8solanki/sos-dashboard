@@ -6,12 +6,13 @@ import MenuItem from '@material-ui/core/MenuItem'
 import { Button } from '@material-ui/core'
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined'
 import { useHistory, useLocation } from 'react-router-dom'
-import { useRecoilState } from 'recoil'
-import { isAuthAtom } from '../recoil/atoms'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { currentUserAtom, isAuthAtom } from '../recoil/atoms'
 
 function Navbar() {
 	const [anchorEl, setAnchorEl] = useState(null)
 	const [isAuth, setIsAuth] = useRecoilState(isAuthAtom)
+	const currentUser = useRecoilValue(currentUserAtom)
 	const history = useHistory()
 	const handleClick = (event) => setAnchorEl(event.currentTarget)
 	const handleClose = () => setAnchorEl(null)
@@ -35,7 +36,7 @@ function Navbar() {
 			</Logo>
 
 			<Button startIcon={<AccountCircleOutlinedIcon />} onClick={handleClick}>
-				Keval
+				{currentUser.firstName}
 			</Button>
 			<Menu
 				anchorEl={anchorEl}
