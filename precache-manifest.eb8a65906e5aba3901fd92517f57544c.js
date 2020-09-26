@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "5edb75832aa9cd7a210cc321d0b84cd8",
+    "revision": "3038e220ad8c05cacaa439c11711d9ef",
     "url": "/sos-dashboard/index.html"
   },
   {
-    "revision": "141931dc76a3c4de2fee",
+    "revision": "9bf6e335f1b042c2831c",
     "url": "/sos-dashboard/static/css/main.71ed0570.chunk.css"
   },
   {
-    "revision": "bafba4eddb8dd7ac0162",
-    "url": "/sos-dashboard/static/js/2.b275b71f.chunk.js"
+    "revision": "48e185921b84b9c5a5dc",
+    "url": "/sos-dashboard/static/js/2.4ecac381.chunk.js"
   },
   {
     "revision": "e48cce1e44c25543cb9e68ec58e85994",
-    "url": "/sos-dashboard/static/js/2.b275b71f.chunk.js.LICENSE.txt"
+    "url": "/sos-dashboard/static/js/2.4ecac381.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "141931dc76a3c4de2fee",
-    "url": "/sos-dashboard/static/js/main.5dff865c.chunk.js"
+    "revision": "9bf6e335f1b042c2831c",
+    "url": "/sos-dashboard/static/js/main.43368e01.chunk.js"
   },
   {
     "revision": "e1aa88ec7ba1a3fceab2",
@@ -26,6 +26,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "15cf12cecebee2fc60ff6fb067224a02",
     "url": "/sos-dashboard/static/media/add.15cf12ce.svg"
+  },
+  {
+    "revision": "dc48654191f54cccb513d19d633a8b76",
+    "url": "/sos-dashboard/static/media/arrow.dc486541.svg"
   },
   {
     "revision": "910669c3e33147e873e966d22a5cb313",
