@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "159ce1ccb70da6f201ae179ad18720ff",
+    "revision": "494aa6845c17fdd1f9bff2310b7a533d",
     "url": "/sos-dashboard/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sos-dashboard/static/css/2.7b9c825f.chunk.css"
   },
   {
-    "revision": "ad714df5b5004ab6ecf2",
+    "revision": "5e26e82a9e2131edb15f",
     "url": "/sos-dashboard/static/css/main.71ed0570.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sos-dashboard/static/js/2.018a6f1a.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "ad714df5b5004ab6ecf2",
-    "url": "/sos-dashboard/static/js/main.139905c7.chunk.js"
+    "revision": "5e26e82a9e2131edb15f",
+    "url": "/sos-dashboard/static/js/main.2298dc59.chunk.js"
   },
   {
     "revision": "e1aa88ec7ba1a3fceab2",
