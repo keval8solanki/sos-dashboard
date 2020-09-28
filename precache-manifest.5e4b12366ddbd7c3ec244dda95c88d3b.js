@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "494aa6845c17fdd1f9bff2310b7a533d",
+    "revision": "c38514b65a6f88b0a3bccbe16a8cef91",
     "url": "/sos-dashboard/index.html"
   },
   {
-    "revision": "c1f895b2d3258eb55c17",
+    "revision": "6dbe6649ae530c8cb704",
     "url": "/sos-dashboard/static/css/2.7b9c825f.chunk.css"
   },
   {
-    "revision": "5e26e82a9e2131edb15f",
+    "revision": "36fefbe21a245e35e001",
     "url": "/sos-dashboard/static/css/main.71ed0570.chunk.css"
   },
   {
-    "revision": "c1f895b2d3258eb55c17",
-    "url": "/sos-dashboard/static/js/2.018a6f1a.chunk.js"
+    "revision": "6dbe6649ae530c8cb704",
+    "url": "/sos-dashboard/static/js/2.dcba5bc0.chunk.js"
   },
   {
-    "revision": "be51bda66fbd4e1db400d46f05203a94",
-    "url": "/sos-dashboard/static/js/2.018a6f1a.chunk.js.LICENSE.txt"
+    "revision": "bd76a1977bdd478f65096858a9db684e",
+    "url": "/sos-dashboard/static/js/2.dcba5bc0.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "5e26e82a9e2131edb15f",
-    "url": "/sos-dashboard/static/js/main.2298dc59.chunk.js"
+    "revision": "36fefbe21a245e35e001",
+    "url": "/sos-dashboard/static/js/main.ffaf0833.chunk.js"
   },
   {
     "revision": "e1aa88ec7ba1a3fceab2",
