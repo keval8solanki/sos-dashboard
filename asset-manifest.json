@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/sos-dashboard/static/css/main.71ed0570.chunk.css",
-    "main.js": "/sos-dashboard/static/js/main.ad71e2e5.chunk.js",
+    "main.js": "/sos-dashboard/static/js/main.05c7affb.chunk.js",
     "runtime-main.js": "/sos-dashboard/static/js/runtime-main.e6712657.js",
     "static/css/2.7b9c825f.chunk.css": "/sos-dashboard/static/css/2.7b9c825f.chunk.css",
     "static/js/2.d0bf9756.chunk.js": "/sos-dashboard/static/js/2.d0bf9756.chunk.js",
     "index.html": "/sos-dashboard/index.html",
-    "precache-manifest.e5f6eb252b31cb059e6332a3fd21ac36.js": "/sos-dashboard/precache-manifest.e5f6eb252b31cb059e6332a3fd21ac36.js",
+    "precache-manifest.835e4d1719545b56fdca0735c16545ec.js": "/sos-dashboard/precache-manifest.835e4d1719545b56fdca0735c16545ec.js",
     "service-worker.js": "/sos-dashboard/service-worker.js",
     "static/js/2.d0bf9756.chunk.js.LICENSE.txt": "/sos-dashboard/static/js/2.d0bf9756.chunk.js.LICENSE.txt",
     "static/media/add.svg": "/sos-dashboard/static/media/add.15cf12ce.svg",
@@ -26,6 +26,6 @@
     "static/css/2.7b9c825f.chunk.css",
     "static/js/2.d0bf9756.chunk.js",
     "static/css/main.71ed0570.chunk.css",
-    "static/js/main.ad71e2e5.chunk.js"
+    "static/js/main.05c7affb.chunk.js"
   ]
 }
