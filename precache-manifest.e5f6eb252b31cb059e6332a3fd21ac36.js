@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c2266028fda8bcb9a6d67c91056f5ede",
+    "revision": "8232067e62d7d16b77c800e81020aa96",
     "url": "/sos-dashboard/index.html"
   },
   {
-    "revision": "597b9cbc44a4e2e8d8d7",
+    "revision": "25509b761ce13617c1dc",
     "url": "/sos-dashboard/static/css/2.7b9c825f.chunk.css"
   },
   {
-    "revision": "0d603b4a03476a4c742f",
+    "revision": "ea9b16904ec8c0627d3b",
     "url": "/sos-dashboard/static/css/main.71ed0570.chunk.css"
   },
   {
-    "revision": "597b9cbc44a4e2e8d8d7",
-    "url": "/sos-dashboard/static/js/2.794797c8.chunk.js"
+    "revision": "25509b761ce13617c1dc",
+    "url": "/sos-dashboard/static/js/2.d0bf9756.chunk.js"
   },
   {
     "revision": "25ca7599a1508ad7e31eecaa83b71f16",
-    "url": "/sos-dashboard/static/js/2.794797c8.chunk.js.LICENSE.txt"
+    "url": "/sos-dashboard/static/js/2.d0bf9756.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "0d603b4a03476a4c742f",
-    "url": "/sos-dashboard/static/js/main.a7840510.chunk.js"
+    "revision": "ea9b16904ec8c0627d3b",
+    "url": "/sos-dashboard/static/js/main.ad71e2e5.chunk.js"
   },
   {
     "revision": "e1aa88ec7ba1a3fceab2",
@@ -52,12 +52,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sos-dashboard/static/media/dashboard.3949fa5b.svg"
   },
   {
-    "revision": "df887e14d808d5219347c3353554a250",
-    "url": "/sos-dashboard/static/media/job.df887e14.svg"
+    "revision": "d6d67d3421fd43d12d1b0ca0a822c476",
+    "url": "/sos-dashboard/static/media/dual-ball-loader.d6d67d34.svg"
   },
   {
-    "revision": "d9a6520ebd171dd0deb6f0e4c93cb23a",
-    "url": "/sos-dashboard/static/media/loader.d9a6520e.svg"
+    "revision": "df887e14d808d5219347c3353554a250",
+    "url": "/sos-dashboard/static/media/job.df887e14.svg"
   },
   {
     "revision": "9f9a73291c417d8799905ca5d77dcd62",
