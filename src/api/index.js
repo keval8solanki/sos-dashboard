@@ -1,18 +1,10 @@
-// Development
-// export const API_URI = 'http://localhost:4000'
+const STAGE = process.env.NODE_ENV === 'production' ? true : false
 
-// Production
-export const API_URI = 'https://api-sos.herokuapp.com'
-
-const action = {
-	READ: 'read',
-	CREATE: 'create',
-	UPDATE: 'update',
-	DELETE: 'delete',
-}
+export const API_URI = STAGE
+	? 'https://api-sos.herokuapp.com'
+	: 'http://localhost:4000'
 
 export const createJob = `${API_URI}/job`
-export const updateJob = `${API_URI}/${action.UPDATE}`
 export const getJobs = `${API_URI}/jobs`
 
 export const getJob = `${API_URI}/job`
@@ -42,5 +34,9 @@ export const usersEndpoint = `${API_URI}/users`
 export const loginEndpoint = `${API_URI}/login`
 export const logoutEndpoint = `${API_URI}/logout`
 export const verifyEndpoint = `${API_URI}/verify`
+
+export const statusEndpoint = `${API_URI}/status`
+
+export const statsEndpoint = `${API_URI}/stats`
 
 // export const getPublicJobs = `${API_URI}/public-jobs`

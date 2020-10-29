@@ -8,10 +8,13 @@ import {
 	RemoveSpaces,
 	ControlButton,
 } from '../../../styles'
-import Axios from 'axios'
+import axios from 'axios'
 import { companyEndpoint } from '../../../api'
+import { useHistory } from 'react-router-dom'
+import { toast } from '../../../components/Toast'
 
 function CompanyInput() {
+	const history = useHistory()
 	const [companyName, setCompanyName] = useState('')
 	const [companyAddress, setCompanyAddress] = useState('')
 
@@ -21,12 +24,12 @@ function CompanyInput() {
 			companyAddress,
 		}
 		try {
-			await Axios.post(companyEndpoint, companyData)
-			alert('Company Added')
+			await axios.post(companyEndpoint, companyData, { withCredentials: true })
+			toast.success('Company Added')
+			history.goBack()
 		} catch (err) {
-			alert(err)
+			toast.error('Something went wrong')
 		}
-		console.log(companyData)
 	}
 
 	return (
@@ -44,6 +47,7 @@ function CompanyInput() {
 				<Card>
 					<Title>Company Details</Title>
 					<CompanyTextField
+						variant='outlined'
 						value={companyName}
 						onChange={(e) => setCompanyName(e.target.value)}
 						label='Company Name'

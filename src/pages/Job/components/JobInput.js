@@ -1,67 +1,55 @@
+import { IconButton, InputLabel, MenuItem } from '@material-ui/core'
+import { AddCircle } from '@material-ui/icons'
+import axios from 'axios'
 import 'date-fns'
-import DateFnsUtils from '@date-io/date-fns'
-import {
-	Button,
-	IconButton,
-	InputLabel,
-	MenuItem,
-	Select,
-	TextField,
-} from '@material-ui/core'
+import { get } from 'lodash'
 import React, { useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import styled from 'styled-components'
+import { companiesEndpoint, jobEndpoint } from '../../../api'
 import Controls from '../../../components/Controls'
-import Checkbox from '@material-ui/core/Checkbox'
-import {
-	KeyboardDatePicker,
-	MuiPickersUtilsProvider,
-} from '@material-ui/pickers'
+import { companyAtom, currentUserAtom, jobAtom } from '../../../recoil/atoms'
 import {
 	Card,
 	CardTitle,
-	CategoryTitle,
 	ContentContainer,
 	ControlButton,
-	InputContainer,
-	ItemList,
 	ItemListContainer,
 	MultipleItemInputContainer,
 	RemoveSpaces,
 	StyledCheckbox,
-	StyledTextField,
 } from '../../../styles'
-import {
-	addValToArr,
-	codeGenerator,
-	jobCodeGenerator,
-	renderArr,
-} from '../../../utils/helperFunctions'
-import Axios from 'axios'
-import { companiesEndpoint, createJob, jobEndpoint } from '../../../api'
 import {
 	SMUIFormControl,
 	SMUISelect,
 	SMUITextField,
 } from '../../../styles/StyledMaterialUI'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { companyAtom, currentUserAtom, jobAtom } from '../../../recoil/atoms'
-import { NavLink, useHistory, useLocation } from 'react-router-dom'
-import { AddCircle } from '@material-ui/icons'
-import { get } from 'lodash'
+import {
+	addValToArr,
+	codeGenerator,
+	pickerDateFormat,
+	renderArr,
+} from '../../../utils/helperFunctions'
+import { toast } from '../../../components/Toast'
 
 function JobInput({ edit, match }) {
 	const history = useHistory()
+
 	const jobId = get(match, 'params.id', '')
+
 	const [companies, setCompanies] = useRecoilState(companyAtom)
+
 	const jobs = useRecoilValue(jobAtom)
 	const currentUser = useRecoilValue(currentUserAtom)
 	const [job, setJob] = useState(
 		jobs && jobs.find((job) => job.jobDetails.jobCode === jobId)
 	)
-	console.log({ job })
+
 	useEffect(() => {
 		if (!job) {
-			Axios.get(`${jobEndpoint}/${jobId}`)
+			axios
+				.get(`${jobEndpoint}/${jobId}`)
 				.then(({ data }) => setJob(data))
 				.catch((e) => console.log(e))
 		}
@@ -80,7 +68,7 @@ function JobInput({ edit, match }) {
 
 	//companydetails
 	const [companyId, setCompanyId] = useState(
-		get(job, 'companyDetails.companyId', '')
+		get(job, 'companyDetails.companyId._id', '')
 	)
 
 	const [isCompanyDetailsVisible, setIsCompanyDetailsVisible] = useState(
@@ -118,17 +106,17 @@ function JobInput({ edit, match }) {
 		get(job, 'jobDetails.additionalInformation', '')
 	)
 	const [targetDate, setTargetDate] = useState(
-		get(job, 'jobDetails.targetDate')
+		pickerDateFormat(get(job, 'jobDetails.targetDate'))
 	)
 
 	useEffect(() => {
-		Axios.get(companiesEndpoint)
+		axios
+			.get(companiesEndpoint, { withCredentials: true })
 			.then(({ data }) => setCompanies(data))
 			.catch((e) => console.log(e))
 	}, [])
 
 	//functions
-	const resetFields = () => {}
 
 	//handlers
 	const saveHandler = async (isEdit) => {
@@ -163,21 +151,22 @@ function JobInput({ edit, match }) {
 			},
 			source: currentUser._id,
 		}
-		console.log('Saving..')
-		console.log(newJobData)
 		try {
 			if (isEdit) {
-				const { data } = await Axios.patch(
-					`${jobEndpoint}/${jobId}`,
-					newJobData
-				)
+				await axios.patch(`${jobEndpoint}/${jobId}`, newJobData, {
+					withCredentials: true,
+				})
+
+				toast.success('Job Edited')
+				history.goBack()
 			} else {
-				const { data } = await Axios.post(jobEndpoint, newJobData)
+				await axios.post(jobEndpoint, newJobData, { withCredentials: true })
+				toast.success('New Job Added')
+				history.goBack()
 			}
 		} catch (err) {
-			alert(err)
+			toast.error('Something went wrong')
 		}
-		console.log(newJobData)
 	}
 
 	const renderCompaniesOption =
@@ -199,12 +188,15 @@ function JobInput({ edit, match }) {
 			{/* Control */}
 			<Controls title='Job Control'>
 				<ControlButton color='secondary'>Reset</ControlButton>
-				<ControlButton
-					variant='contained'
-					color='primary'
-					onClick={() => saveHandler(edit)}>
-					Save
-				</ControlButton>
+				{(get(currentUser, 'roleId.permissions.job.create') ||
+					get(currentUser, 'roleId.permissions.job.update')) && (
+					<ControlButton
+						variant='contained'
+						color='primary'
+						onClick={() => saveHandler(edit)}>
+						Save
+					</ControlButton>
+				)}
 			</Controls>
 			<ContentContainer>
 				<Card>
@@ -228,23 +220,24 @@ function JobInput({ edit, match }) {
 						type='number'
 						label='No. of Opening'
 					/>
-					<SMUIFormControl>
+					<SMUIFormControl variant='outlined'>
 						<InputLabel id='jobtype'>Job type</InputLabel>
 						<SMUISelect
-							// variant='outlined'
-							labelId='jobtype'
 							value={jobType}
+							label='Job type'
 							onChange={(e) => setJobType(e.target.value)}>
 							<MenuItem value='Full-time'>Full-Time</MenuItem>
 							<MenuItem value='Part-time'>Part-time</MenuItem>
 							<MenuItem value='Freelancing'>Part-time</MenuItem>
 						</SMUISelect>
 					</SMUIFormControl>
-					<SMUIFormControl>
+
+					<SMUIFormControl variant='outlined'>
 						<InputLabel id='company'>Company</InputLabel>
 						<SMUISelect
 							labelId='company'
 							value={companyId}
+							label='Company'
 							onChange={(e) => setCompanyId(e.target.value)}>
 							{renderCompaniesOption}
 
@@ -253,6 +246,7 @@ function JobInput({ edit, match }) {
 							</MenuItem>
 						</SMUISelect>
 					</SMUIFormControl>
+
 					<CheckBoxContainer>
 						<StyledCheckbox
 							checked={isCompanyDetailsVisible}
@@ -267,44 +261,48 @@ function JobInput({ edit, match }) {
 					<CardTitle>Job Address</CardTitle>
 
 					<SMUITextField
+						variant='outlined'
 						value={city}
 						onChange={(e) => setCity(e.target.value)}
 						label='City'
 					/>
 
 					<SMUITextField
+						variant='outlined'
 						value={state}
 						onChange={(e) => setState(e.target.value)}
 						label='State'
 					/>
 					<SMUITextField
+						variant='outlined'
 						value={pincode}
 						onChange={(e) => setPincode(e.target.value)}
 						label='Pincode'
 					/>
 					<SMUITextField
+						variant='outlined'
 						value={country}
 						onChange={(e) => setCountry(e.target.value)}
 						label='Country'
 					/>
-					<SMUIFormControl>
+					<SMUIFormControl variant='outlined'>
 						<InputLabel id='jobLocation'>Job Location</InputLabel>
 						<SMUISelect
 							value={jobLocation}
 							onChange={(e) => setJobLocation(e.target.value)}
-							labelId='jobLocation'>
+							label='Job Location'>
 							<MenuItem value='On Location'>On Location</MenuItem>
 							<MenuItem value='Remote'>Remote</MenuItem>
 						</SMUISelect>
 					</SMUIFormControl>
 
-					<SMUIFormControl>
+					<SMUIFormControl variant='outlined'>
 						<InputLabel id='zone'>Zone</InputLabel>
 
 						<SMUISelect
 							value={zone}
 							onChange={(e) => setZone(e.target.value)}
-							labelId='zone'>
+							label='Zone'>
 							<MenuItem value='North'>North</MenuItem>
 							<MenuItem value='East'>East</MenuItem>
 							<MenuItem value='West'>West</MenuItem>
@@ -330,6 +328,7 @@ function JobInput({ edit, match }) {
 							addValToArr(e, eligibilityVal, eligibility, setEligibility)
 						}>
 						<SMUITextField
+							variant='outlined'
 							value={eligibilityVal}
 							onChange={(e) => setEligibilityVal(e.target.value)}
 							label='Eligibility'
@@ -354,6 +353,7 @@ function JobInput({ edit, match }) {
 							)
 						}>
 						<SMUITextField
+							variant='outlined'
 							label='Responsibilities'
 							value={responsibilitiesVal}
 							onChange={(e) => setResponsibilitiesVal(e.target.value)}
@@ -372,14 +372,18 @@ function JobInput({ edit, match }) {
 						onSubmit={(e) =>
 							addValToArr(e, benefitsVal, benefits, setBenefits)
 						}>
+						
 						<SMUITextField
+							variant='outlined'
 							label='Benefits'
 							value={benefitsVal}
 							onChange={(e) => setBenefitsVal(e.target.value)}
 						/>
+
 						<IconButton type='submit' variant='contained' color='primary'>
 							<AddCircle />
 						</IconButton>
+
 					</MultipleItemInputContainer>
 
 					<SMUITextField
@@ -402,9 +406,11 @@ function JobInput({ edit, match }) {
 						label='Additional Information'
 					/>
 
-					<SMUIFormControl>
+					<SMUIFormControl variant='outlined'>
 						<SMUITextField
-							value={targetDate}
+							variant='outlined'
+							defaultValue={targetDate}
+							label='Target Date'
 							onChange={(e) => setTargetDate(e.target.value)}
 							type='date'
 							placeholder='Target Date'
@@ -414,6 +420,8 @@ function JobInput({ edit, match }) {
 			</ContentContainer>
 
 			{/* inputs */}
+			{toast}
+			{/* {isSaved && <Redirect to='/job' />} */}
 		</JobInputContainer>
 	)
 }

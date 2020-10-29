@@ -13,7 +13,7 @@ export const candidateAtom = atom({
 
 export const companyAtom = atom({
 	key: 'companies',
-	default: null
+	default: null,
 })
 
 export const roleAtom = atom({
@@ -23,11 +23,15 @@ export const roleAtom = atom({
 
 export const userAtom = atom({
 	key: 'users',
+	default: null,
+})
+
+export const statsAtom = atom({
+	key: 'stats',
 	default: null
 })
 
 //--------------
-
 
 export const jobCheckedAtom = atom({
 	key: 'jobChecked',
@@ -54,9 +58,6 @@ export const userCheckedAtom = atom({
 	default: {},
 })
 
-
-
-
 //------------
 
 export const jobTab = atom({
@@ -66,9 +67,15 @@ export const jobTab = atom({
 
 export const candidateTab = atom({
 	key: 'candidateTab',
+	default: 2,
+})
+
+export const appliedCandidateTabAtom = atom({
+	key: 'appliedCandidateTabAtom',
 	default: 0,
 })
 
+// -------------
 export const credentialAtom = atom({
 	key: 'cred',
 	default: { email: '', password: '' },
@@ -76,10 +83,15 @@ export const credentialAtom = atom({
 
 export const isAuthAtom = atom({
 	key: 'isAuth',
-	default: false,
+	default: true,
 })
 
 export const currentUserAtom = atom({
 	key: 'currentUser',
-	default: null
+	default: null,
+})
+
+export const statusAtom = atom({
+	key: 'status',
+	default: null,
 })

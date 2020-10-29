@@ -1,18 +1,22 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { Card, RemoveSpaces, themeBorder } from '../styles/index'
+import { Button } from '@material-ui/core'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import { Button } from '@material-ui/core'
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined'
-import { useHistory, useLocation } from 'react-router-dom'
+import axios from 'axios'
+import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import { useRecoilState, useRecoilValue } from 'recoil'
+import styled from 'styled-components'
+import { logoutEndpoint } from '../api'
 import { currentUserAtom, isAuthAtom } from '../recoil/atoms'
+import { RemoveSpaces, themeBorder } from '../styles/index'
+import { toast } from './Toast'
 
 function Navbar() {
 	const [anchorEl, setAnchorEl] = useState(null)
-	const [isAuth, setIsAuth] = useRecoilState(isAuthAtom)
+	const [, setIsAuth] = useRecoilState(isAuthAtom)
 	const currentUser = useRecoilValue(currentUserAtom)
+
 	const history = useHistory()
 	const handleClick = (event) => setAnchorEl(event.currentTarget)
 	const handleClose = () => setAnchorEl(null)
@@ -22,22 +26,27 @@ function Navbar() {
 		handleClose()
 	}
 
-	const logoutHandler = () => {
-		setIsAuth(false)
-		handleClose()
-		history.push(`/`)
+	const logoutHandler = async () => {
+		try {
+			await axios.post(logoutEndpoint, {}, { withCredentials: true })
+			setIsAuth(false)
+			handleClose()
+			history.push(`/`)
+		} catch (e) {
+			toast.error('Something went wrong')
+		}
 	}
 
 	return (
 		<NavbarContainer>
-			{/* Logo */}
 			<Logo>
 				Switch <LogoHighlight>On Success</LogoHighlight>
 			</Logo>
 
 			<Button startIcon={<AccountCircleOutlinedIcon />} onClick={handleClick}>
-				{currentUser.firstName}
+				{currentUser && currentUser.firstName}
 			</Button>
+
 			<Menu
 				anchorEl={anchorEl}
 				keepMounted
@@ -69,4 +78,3 @@ const Logo = styled.h4`
 const LogoHighlight = styled.span`
 	color: orange;
 `
-const NavItemContainer = styled.div``

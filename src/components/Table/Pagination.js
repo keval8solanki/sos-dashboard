@@ -1,5 +1,4 @@
 import React from 'react'
-import styled from 'styled-components'
 
 function Pagination() {
     return (
@@ -11,6 +10,3 @@ function Pagination() {
 
 export default Pagination
 
-const PaginationContainer = styled.div`
-
-`

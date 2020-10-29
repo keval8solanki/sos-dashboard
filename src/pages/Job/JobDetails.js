@@ -1,46 +1,50 @@
+import axios from 'axios'
+import { get } from 'lodash'
 import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
-
-import { jobAtom, jobTab } from '../../recoil/atoms'
-import PageTab from '../../components/PageTab'
-import {
-	PageLayout,
-	TableHead,
-	TableRow,
-	TableData,
-	ContentContainer,
-	ControlButton,
-	Card,
-	themeBorder,
-	RemoveSpaces,
-} from '../../styles'
+import { NavLink, useHistory } from 'react-router-dom'
 import { useRecoilValue } from 'recoil'
-import Axios from 'axios'
-import { deleteJob, getJob, jobEndpoint } from '../../api'
-import JobInfo from './components/JobInfo'
-import { Button, Checkbox } from '@material-ui/core'
-import { NavLink, useHistory, useLocation } from 'react-router-dom'
-import Table from '../../components/Table'
+import styled from 'styled-components'
+import { jobEndpoint } from '../../api'
+import ArrowBG from '../../assets/icons/arrow.svg'
 import Controls from '../../components/Controls'
 import DeleteModal from '../../components/Modals/DeleteModal'
+import PageTab from '../../components/PageTab'
+import Table from '../../components/Table'
+import { currentUserAtom, jobAtom, jobTab } from '../../recoil/atoms'
+
+import {
+	Card,
+	ContentContainer,
+	ControlButton,
+	PipelineCard,
+	PipelineContainer,
+	PipelineStat,
+	PipelineTitle,
+	RemoveSpaces,
+	TableData,
+	TableHead,
+	TableRow,
+} from '../../styles'
+
 import { counter, renderWithLoader } from '../../utils/helperFunctions'
-import { get } from 'lodash'
-import ArrowBG from '../../assets/icons/arrow.svg'
+import { stages } from '../../utils/sharedVariables'
+import JobInfo from './components/JobInfo'
+import { toast } from '../../components/Toast'
+import { v4 as uuid } from 'uuid'
+
 
 function JobDetails({ match }) {
 	const history = useHistory()
-	const location = useLocation().pathname
 	const id = match.params.id
 	const jobTabIndex = useRecoilValue(jobTab)
 	const labels = ['PipeLine', 'Applied Candidates', 'Job Details']
-	const [checked, setChecked] = useState([])
 	const [job, setJob] = useState()
 	const jobFullData = useRecoilValue(jobAtom)
+	const currentUser = useRecoilValue(currentUserAtom)
+
 	const selectedJob = jobFullData
 		? jobFullData.find((job) => job.jobDetails.jobCode === id)
 		: job
-
-	console.log({ selectedJob })
 
 	const stageDataCount = counter(
 		get(selectedJob, 'statusIds', []).map(
@@ -48,24 +52,9 @@ function JobDetails({ match }) {
 		)
 	)
 
-	console.log(stageDataCount)
-
-	const stages = [
-		'Shortlisted',
-		'Assessment',
-		'Hiring manager review',
-		'Interview 1',
-		'Interview 2',
-		'Interview 3',
-		'Salary Fitment',
-		'Offer',
-		'Documentation',
-		'Joining',
-	]
-
 	const renderPipeline = stages.map((stage) => {
 		return (
-			<PipelineCard>
+			<PipelineCard key={uuid()}>
 				<PipelineStat>{get(stageDataCount, stage, 0)}</PipelineStat>
 				<PipelineTitle>{stage}</PipelineTitle>
 			</PipelineCard>
@@ -74,31 +63,30 @@ function JobDetails({ match }) {
 
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const toggleModal = () => setIsModalOpen(!isModalOpen)
+
 	useEffect(() => {
-		console.log('Use Effect Running...')
-		Axios.get(`${jobEndpoint}/${id}`)
+		axios
+			.get(`${jobEndpoint}/${id}`, { withCredentials: true })
 			.then(({ data }) => {
 				setJob(data)
 			})
 			.catch((e) => console.log(e))
 	}, [])
+
 	const candidateData = get(selectedJob, 'statusIds', []).map(
 		(item) => item.candidateId
 	)
-	const onCheckHandler = (id) => {
-		const newData = {
-			...checked,
-			[id]: !checked[id],
-		}
-		setChecked(newData)
-	}
 
 	const deleteHandler = async () => {
 		try {
-			const deleted = Axios.delete(`${deleteJob}/${id}`)
+			await axios.delete(`${jobEndpoint}/${id}`, { withCredentials: true })
 			toggleModal()
+			toast.success('Job Deleted')
+
+			history.goBack()
 		} catch (err) {
-			alert(err)
+			toggleModal()
+			toast.error('Something went wrong')
 		}
 	}
 
@@ -112,36 +100,37 @@ function JobDetails({ match }) {
 		'Email',
 		'Mobile',
 		'City',
-		`Experience`,
+		// `Experience`,
 		`Industry`,
 		`Functional Area`,
 		'Status',
 	]
 
 	const renderCandidateHeading = candidateHeading.map((heading) => (
-		<TableHead>{heading}</TableHead>
+		<TableHead key={uuid()}>{heading}</TableHead>
 	))
 
-	const renderCandidateData =
-		candidateData &&
-		candidateData.map((candidate) => {
+	const renderCandidateData = get(selectedJob, 'statusIds', []).map(
+		({ candidateId, currentStage, _id }) => {
 			return (
-				<TableRow key={candidate._id}>
+				<TableRow key={candidateId._id}>
 					<TableData>
-						<NavLink to={`/applied/${candidate.candidateCode}`}>
-							{candidate.candidateCode}
-						</NavLink>{' '}
+						<NavLink to={`/applied/${_id}`}>
+							{candidateId.candidateCode}
+						</NavLink>
 					</TableData>
-					<TableData>{candidate.basic.fullName}</TableData>
-					<TableData>{candidate.basic.primaryEmail}</TableData>
-					<TableData>{candidate.basic.mobile}</TableData>
-					<TableData>{candidate.address.state}</TableData>
-					<TableData>45</TableData>
-					<TableData>{candidate.professional.industry}</TableData>
-					<TableData>{candidate.professional.functionalArea}</TableData>
+					<TableData>{candidateId.basic.fullName}</TableData>
+					<TableData>{candidateId.basic.primaryEmail}</TableData>
+					<TableData>{candidateId.basic.mobile}</TableData>
+					<TableData>{candidateId.address.state}</TableData>
+					{/* <TableData>45</TableData> */}
+					<TableData>{candidateId.professional.industry}</TableData>
+					<TableData>{candidateId.professional.functionalArea}</TableData>
+					<TableData>{currentStage.stageName}</TableData>
 				</TableRow>
 			)
-		})
+		}
+	)
 
 	const renderTabBody = (index) => {
 		switch (index) {
@@ -172,15 +161,19 @@ function JobDetails({ match }) {
 			<Controls
 				title={get(selectedJob, 'jobOpeningInfo.jobTitle', 'Loading..')}>
 				{/* <Controls title='Details'> */}
-				<ControlButton onClick={toggleModal} color='secondary'>
-					Delete
-				</ControlButton>
-				<ControlButton
-					onClick={editNavHandler}
-					variant='contained'
-					color='primary'>
-					Edit
-				</ControlButton>
+				{get(currentUser, 'roleId.permissions.job.delete') && (
+					<ControlButton onClick={toggleModal} color='secondary'>
+						Delete
+					</ControlButton>
+				)}
+				{get(currentUser, 'roleId.permissions.job.update') && (
+					<ControlButton
+						onClick={editNavHandler}
+						variant='contained'
+						color='primary'>
+						Edit
+					</ControlButton>
+				)}
 			</Controls>
 
 			<ContentContainer>
@@ -198,45 +191,3 @@ function JobDetails({ match }) {
 }
 
 export default JobDetails
-
-const JobDetailsContainer = styled.div``
-
-const PipelineContainer = styled(Card)`
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	row-gap: 1em;
-	padding: 50px;
-`
-const PipelineCard = styled.div`
-	display: flex;
-	padding: 20px;
-	align-items: center;
-	justify-content: center;
-	background-color: #4caf5029;
-	margin: 0px;
-	height: 50px;
-	transition: all 0.3s;
-	clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0% 100%, 10% 50%, 0% 0%);
-
-	&:hover {
-		background-color: #ffc10726;
-		transform: translateX(10px);
-	}
-	/* background-image: url(${ArrowBG}); */
-	/* background-repeat: no-repeat; */
-`
-const PipelineTitle = styled.p`
-	${RemoveSpaces};
-	color: #333;
-	font-weight: lighter;
-	font-size: 1.25em;
-`
-
-const PipelineStat = styled.p`
-	${RemoveSpaces};
-	padding-right: 10px;
-
-	font-size: 2em;
-	font-weight: bold;
-	color: #333;
-`

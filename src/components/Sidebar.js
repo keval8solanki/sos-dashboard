@@ -1,49 +1,26 @@
+import { get } from 'lodash'
 import React from 'react'
+import { useRecoilValue } from 'recoil'
 import styled from 'styled-components'
+import { v4 as uniqueID } from 'uuid'
+import CandidateIcon from '../assets/icons/candidate.svg'
+import CompanyIcon from '../assets/icons/company.svg'
 import DashboardIcon from '../assets/icons/dashboard.svg'
 import JobIcon from '../assets/icons/job.svg'
-import CandidateIcon from '../assets/icons/candidate.svg'
 import RoleIcon from '../assets/icons/role.svg'
 import UserIcon from '../assets/icons/user.svg'
-import CompanyIcon from '../assets/icons/company.svg'
-import ProfileIcon from '../assets/icons/profile.svg'
-
-import { v4 as uniqueID } from 'uuid'
+import { currentUserAtom } from '../recoil/atoms'
 import { StyledNavlink } from '../styles'
 
+
+
 function Sidebar() {
-	const sidebarData = [
-		{
-			icon: DashboardIcon,
-			linkTo: '/dashboard',
-			text: 'Dashboard',
-		},
-		{
-			icon: JobIcon,
-			linkTo: '/job',
-			text: 'Job',
-		},
-		{
-			icon: CandidateIcon,
-			linkTo: '/candidate',
-			text: 'Candidate',
-		},
-		{
-			icon: CompanyIcon,
-			linkTo: '/company',
-			text: 'Company',
-		},
-		{
-			icon: RoleIcon,
-			linkTo: '/role',
-			text: 'Role',
-		},
-		{
-			icon: UserIcon,
-			linkTo: '/user',
-			text: 'User',
-		},
-	]
+	const currentUser = useRecoilValue(currentUserAtom)
+	const { roleId } = currentUser || {}
+	const { permissions } = roleId || {}
+
+	// const { job, candidate, role, user } = permissions || {}
+
 
 	const activeLinkStyle = {
 		color: '#0168fa',
@@ -52,18 +29,62 @@ function Sidebar() {
 		boxShadow: 'inset 1px 1px 3px 0px #016afa2e',
 	}
 
-	const renderLinks = sidebarData.map(({ icon, linkTo, text }) => {
-		return (
+
+	return (
+		<SidebarContainer>
 			<MenuItem key={uniqueID()}>
-				<StyledNavlink activeStyle={activeLinkStyle} to={linkTo}>
-					<NavIcon src={icon} />
-					{text}
+				<StyledNavlink activeStyle={activeLinkStyle} to='/dashboard'>
+					<NavIcon src={DashboardIcon} />
+					Dashboard
 				</StyledNavlink>
 			</MenuItem>
-		)
-	})
 
-	return <SidebarContainer>{renderLinks}</SidebarContainer>
+			{get(permissions, 'job.read') && (
+				<MenuItem key={uniqueID()}>
+					<StyledNavlink activeStyle={activeLinkStyle} to='/job'>
+						<NavIcon src={JobIcon} />
+						Job
+					</StyledNavlink>
+				</MenuItem>
+			)}
+
+			{get(permissions, 'candidate.read') && (
+				<MenuItem key={uniqueID()}>
+					<StyledNavlink activeStyle={activeLinkStyle} to='/candidate'>
+						<NavIcon src={CandidateIcon} />
+						Candidate
+					</StyledNavlink>
+				</MenuItem>
+			)}
+
+			{get(permissions, 'job.read') && (
+				<MenuItem key={uniqueID()}>
+					<StyledNavlink activeStyle={activeLinkStyle} to='/company'>
+						<NavIcon src={CompanyIcon} />
+						Company
+					</StyledNavlink>
+				</MenuItem>
+			)}
+
+			{get(permissions, 'role.read') && (
+				<MenuItem key={uniqueID()}>
+					<StyledNavlink activeStyle={activeLinkStyle} to='/role'>
+						<NavIcon src={RoleIcon} />
+						Role
+					</StyledNavlink>
+				</MenuItem>
+			)}
+
+			{get(permissions, 'user.read') && (
+				<MenuItem key={uniqueID()}>
+					<StyledNavlink activeStyle={activeLinkStyle} to='/user'>
+						<NavIcon src={UserIcon} />
+						User
+					</StyledNavlink>
+				</MenuItem>
+			)}
+		</SidebarContainer>
+	)
 }
 
 export default Sidebar

@@ -11,10 +11,10 @@ import Controls from '../../components/Controls'
 
 import { useHistory, useLocation } from 'react-router-dom'
 import AddIcon from '../../assets/icons/add.svg'
-import Axios from 'axios'
+import axios from 'axios'
 import { usersEndpoint } from '../../api'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { userAtom, userCheckedAtom } from '../../recoil/atoms'
+import { currentUserAtom, userAtom, userCheckedAtom } from '../../recoil/atoms'
 import Table from '../../components/Table'
 import {
 	formatDate,
@@ -28,6 +28,10 @@ import { IconButton } from '@material-ui/core'
 import { AddCircle, Delete } from '@material-ui/icons'
 import DeleteModal from '../../components/Modals/DeleteModal'
 
+import { toast } from '../../components/Toast'
+import { get } from 'lodash'
+import { SMUIIconButton } from '../../styles/StyledMaterialUI'
+
 function UserPage() {
 	const history = useHistory()
 	const location = useLocation().pathname
@@ -37,14 +41,14 @@ function UserPage() {
 
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const toggleModal = () => setIsModalOpen(!isModalOpen)
-
-	console.log({ selected })
+	const currentUser = useRecoilValue(currentUserAtom)
 	const navHandler = (to) => {
 		history.push(`${location}/${to}`)
 	}
 
 	useEffect(() => {
-		Axios.get(usersEndpoint)
+		axios
+			.get(usersEndpoint, { withCredentials: true })
 			.then(({ data }) => setUsers(data))
 			.catch((e) => console.log(e))
 	}, [isModalOpen])
@@ -69,17 +73,26 @@ function UserPage() {
 
 	const deleteHandler = async () => {
 		try {
-			await Axios.patch(usersEndpoint, selected)
+			await axios.patch(usersEndpoint, selected, { withCredentials: true })
 			toggleModal()
 			setChecked({})
+			toast.success('User Deleted')
 		} catch (error) {
-			alert(error)
+			toggleModal()
+
+			toast.error('Something went wrong')
 		}
 	}
-
-	const renderUserData =
+	const showUsers =
 		users &&
-		users.map(
+		users.filter((user) => {
+			if (currentUser) {
+				return currentUser._id.toString() !== user._id.toString()
+			}
+		})
+	const renderUserData =
+		showUsers &&
+		showUsers.map(
 			({
 				_id,
 				firstName,
@@ -91,7 +104,7 @@ function UserPage() {
 				createdAt,
 			}) => {
 				return (
-					<TableRow key={uuid()}>
+					<TableRow key={_id}>
 						<TableData>
 							<StyledCheckbox
 								onChange={(e) => checkHandler(e, _id)}
@@ -115,13 +128,21 @@ function UserPage() {
 		<>
 			<Controls title={titleGenerator(selected, 'Users')}>
 				{selected.length ? (
-					<IconButton color='secondary' onClick={toggleModal}>
-						<Delete />
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.user.delete') && (
+							<SMUIIconButton color='secondary' onClick={toggleModal}>
+								<Delete />
+							</SMUIIconButton>
+						)}
+					</>
 				) : (
-					<IconButton color='primary' onClick={() => navHandler('add')}>
-						<AddCircle />
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.user.create') && (
+							<SMUIIconButton color='primary' onClick={() => navHandler('add')}>
+								<AddCircle />
+							</SMUIIconButton>
+						)}
+					</>
 				)}
 			</Controls>
 			<DeleteModal

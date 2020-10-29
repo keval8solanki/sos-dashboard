@@ -1,9 +1,14 @@
-import Axios from 'axios'
+import { AddCircle, Delete } from '@material-ui/icons'
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import { NavLink, useHistory, useLocation } from 'react-router-dom'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import styled from 'styled-components'
-import { applyJob, deleteJobs, getJobs } from '../../api'
+import { v4 as uuid } from 'uuid'
+import { applyJob, deleteJobs, getJobs, jobsEndpoint } from '../../api'
+import Controls from '../../components/Controls'
+import DeleteModal from '../../components/Modals/DeleteModal'
 import Table from '../../components/Table'
+
 import {
 	candidateCheckedAtom,
 	currentUserAtom,
@@ -11,50 +16,44 @@ import {
 	jobCheckedAtom,
 } from '../../recoil/atoms'
 import {
-	ContentContainer,
-	TableData,
-	TableHead,
-	TableRow,
-	StyledCheckbox,
-	ControlButton,
-} from '../../styles'
-import { NavLink, useHistory, useLocation } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
-import Controls from '../../components/Controls'
-import {
-	titleGenerator,
-	renderWithLoader,
-	formatDate,
-} from '../../utils/helperFunctions'
-import {
 	filterTrueCandidateChecked,
 	filterTrueJobChecked,
 } from '../../recoil/selectors'
-import AddIcon from '../../assets/icons/add.svg'
-import DeleteModal from '../../components/Modals/DeleteModal'
-import { IconButton } from '@material-ui/core'
-import { AddCircle, Delete } from '@material-ui/icons'
+import {
+	ContentContainer,
+	ControlButton,
+	StyledCheckbox,
+	TableData,
+	TableHead,
+	TableRow,
+} from '../../styles'
+import {
+	formatDate,
+	renderWithLoader,
+	titleGenerator,
+} from '../../utils/helperFunctions'
+
+import { toast } from '../../components/Toast'
+import { get } from 'lodash'
+import { SMUIIconButton } from '../../styles/StyledMaterialUI'
 
 function JobPage({ toApply }) {
 	// React Hooks
 	const history = useHistory()
 	const location = useLocation().pathname
 	const [jobData, setJobData] = useRecoilState(jobAtom)
-	console.log({ jobData })
 	const [checked, setChecked] = useRecoilState(jobCheckedAtom)
-	const [candidateChecked, setCandidateChecked] = useRecoilState(
-		candidateCheckedAtom
-	)
+	const [, setCandidateChecked] = useRecoilState(candidateCheckedAtom)
 	const ids = useRecoilValue(filterTrueJobChecked)
 	const candidateSelectedIds = useRecoilValue(filterTrueCandidateChecked)
 	const currentUser = useRecoilValue(currentUserAtom)
-
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	const toggleModal = () => setIsModalOpen(!isModalOpen)
 
 	useEffect(() => {
-		Axios.get(getJobs)
+		axios
+			.get(jobsEndpoint, { withCredentials: true })
 			.then(({ data }) => {
 				setJobData(data)
 			})
@@ -85,38 +84,36 @@ function JobPage({ toApply }) {
 	}
 
 	const deleteHandler = async () => {
-		console.log('Delete Many Clicked')
-
 		try {
-			await Axios.patch(deleteJobs, { ids })
+			await axios.patch(deleteJobs, { ids }, { withCredentials: true })
 			toggleModal()
 			setChecked({})
+			toast.success('Job Deleted')
 		} catch (err) {
-			console.log(err)
-			alert(err)
+			toggleModal()
+
+			toast.error('Something went wrong')
 		}
 	}
 
 	const candidateApplyHandler = async () => {
-		console.log(ids)
-		console.log(candidateSelectedIds)
 		try {
-			await Axios.post(applyJob, {
-				candidates: candidateSelectedIds,
-				jobs: ids,
-				userId: currentUser._id,
-			})
+			await axios.post(
+				applyJob,
+				{
+					candidates: candidateSelectedIds,
+					jobs: ids,
+					userId: currentUser._id,
+				},
+				{ withCredentials: true }
+			)
 			setChecked({})
 			setCandidateChecked({})
-
-			history.push('/candidate')
+			history.goBack()
+			toast.success('Candidates Assigned')
 		} catch (err) {
-			console.log(err)
+			toast.error('Something went wrong')
 		}
-	}
-
-	const assignJobHandler = () => {
-		history.push('/candidate')
 	}
 
 	// Renderers
@@ -124,6 +121,7 @@ function JobPage({ toApply }) {
 		<TableHead key={uuid()}>{heading}</TableHead>
 	))
 
+	console.log({ jobData })
 	const renderJobData =
 		jobData &&
 		jobData.map((job) => {
@@ -181,15 +179,23 @@ function JobPage({ toApply }) {
 								Apply
 							</ControlButton>
 						) : (
-							<IconButton onClick={toggleModal}>
-								<Delete />
-							</IconButton>
+							<>
+								{get(currentUser, 'roleId.permissions.job.delete') && (
+									<SMUIIconButton color='secondary' onClick={toggleModal}>
+										<Delete />
+									</SMUIIconButton>
+								)}
+							</>
 						)}
 					</>
 				) : (
-					<IconButton onClick={addHandler}>
-						<AddCircle />
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.job.create') && (
+							<SMUIIconButton color='primary' onClick={addHandler}>
+								<AddCircle />
+							</SMUIIconButton>
+						)}
+					</>
 				)}
 			</Controls>
 
@@ -211,9 +217,3 @@ function JobPage({ toApply }) {
 }
 
 export default JobPage
-
-const JobPageContainer = styled.div`
-	background-color: #0000000d;
-	width: 100%;
-	padding: 10px;
-`

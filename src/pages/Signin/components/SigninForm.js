@@ -12,8 +12,10 @@ import {
 import { useHistory } from 'react-router-dom'
 import { loginEndpoint } from '../../../api'
 
-import Axios from 'axios'
+import axios from 'axios'
 import { encryptObj } from '../../../utils/helperFunctions'
+
+import { toast } from '../../../components/Toast'
 
 function SigninForm() {
 	const history = useHistory()
@@ -28,20 +30,19 @@ function SigninForm() {
 		const cred = { user, password }
 		const data = encryptObj(cred)
 		try {
-			const resData = await Axios.post(
+			const resData = await axios.post(
 				loginEndpoint,
 				{ data },
 				{ withCredentials: true }
 			)
-			console.log(resData)
 			if (resData.data.userData) {
 				setIsAuth(true)
 				setCurrentUser(resData.data.userData)
+				history.push('/dashboard')
 			}
 		} catch (error) {
-			alert(error)
+			toast.error('Invalid Credentials')
 		}
-		history.push('/dashboard')
 	}
 
 	return (

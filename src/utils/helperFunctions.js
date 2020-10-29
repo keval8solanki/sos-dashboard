@@ -1,7 +1,10 @@
 import React from 'react'
 import Loader from '../components/Loader'
-import { ItemList } from '../styles'
+import { Card, ItemList, TableData, TableHead, TableRow } from '../styles'
 import cryptojs from 'crypto-js'
+import { v4 as uuid } from 'uuid'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import TableSkeletonLoader from '../components/TableSkeletonLoader'
 
 export const codeGenerator = (field1, field2, field3) => {
 	//Helper Function
@@ -19,7 +22,6 @@ export const codeGenerator = (field1, field2, field3) => {
 	}
 
 	const charCode = (str) => {
-		console.log(str)
 		let codeDigit = 0
 		for (let i = 0; i < str.length; i++) {
 			codeDigit += str.charCodeAt(i) - 64
@@ -53,19 +55,19 @@ export const addValToArr = (e, val, data, setData) => {
 const removeValFromArr = (item, data, setData) => {
 	let dataTemp = [...data]
 	dataTemp = dataTemp.filter((val) => val !== item)
-	console.log(dataTemp)
 	setData(dataTemp)
 }
 
 export const renderArr = (data, setData) =>
 	data.map((item) => (
-		<ItemList onClick={() => removeValFromArr(item, data, setData)} key={item}>
+		<ItemList
+			onClick={() => removeValFromArr(item, data, setData)}
+			key={uuid()}>
 			{item} X
 		</ItemList>
 	))
 
 export const trueKeysToArr = (obj) => {
-	console.log(obj)
 	const ids = Object.keys(obj)
 	return ids.filter((id) => obj[id] === true)
 }
@@ -80,7 +82,11 @@ export const titleGenerator = (arr, title) => {
 }
 
 export const renderWithLoader = (val, component) =>
-	val ? component : <Loader />
+	val ? (
+		component
+	) : (
+		<TableSkeletonLoader/>
+	)
 
 export const encryptObj = (obj) => {
 	const objStr = JSON.stringify(obj)
@@ -107,4 +113,9 @@ export const counter = (arr) => {
 	}
 
 	return countObj
+}
+
+export const pickerDateFormat = (dateStr) => {
+	if (dateStr) return new Date(dateStr).toISOString().split('T')[0]
+	return new Date().toISOString().split('T')[0]
 }

@@ -2,11 +2,12 @@ import React from 'react'
 import {
 	ModalBody,
 	ModalButtonContainer,
-	ModalTitle,
-	ModalText,
-	ModalWarning,
+
+	ModalText, ModalTitle,
+
+	ModalWarning
 } from '../../styles'
-import { SMUIModal, SMUIButton } from '../../styles/StyledMaterialUI'
+import { SMUIButton, SMUIModal } from '../../styles/StyledMaterialUI'
 
 function DeleteModal({ open, onClose, count, deleteHandler }) {
 	return (

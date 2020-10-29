@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import LoaderIcon from '../assets/icons/loader.svg'
+import LoaderIcon from '../assets/icons/dual-ball-loader.svg'
 
 function Loader() {
 	return (
@@ -16,6 +16,7 @@ const LoaderContainer = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	height: 100vh;
 `
 
 const LoaderIconContainer = styled.img`

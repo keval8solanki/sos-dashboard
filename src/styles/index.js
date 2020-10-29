@@ -165,6 +165,7 @@ export const StyledCheckbox = styled.input`
 
 export const ModalBody = styled.div`
 	background-color: white;
+	margin-top: 50px;
 	padding: 20px;
 	border-radius: 5px;
 `
@@ -191,4 +192,78 @@ export const ModalButtonContainer = styled.div`
 	display: flex;
 	justify-content: flex-end;
 	margin-top: 20px;
+`
+
+//Pipeline
+export const PipelineContainer = styled(Card)`
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	row-gap: 1em;
+	padding: 50px;
+`
+export const PipelineCard = styled.div`
+	display: flex;
+	padding: 20px;
+	align-items: center;
+	justify-content: center;
+	background-color: #4caf5029;
+	margin: 0px;
+	height: 50px;
+	transition: all 0.3s;
+	clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0% 100%, 10% 50%, 0% 0%);
+
+	&:hover {
+		background-color: #ffc10726;
+		transform: translateX(10px);
+	}
+`
+export const PipelineTitle = styled.p`
+	${RemoveSpaces};
+	color: #333;
+	font-weight: lighter;
+	font-size: 1.25em;
+`
+
+export const PipelineStat = styled.p`
+	${RemoveSpaces};
+	padding-right: 10px;
+
+	font-size: 2em;
+	font-weight: bold;
+	color: #333;
+`
+
+//
+export const Category = styled.div`
+	padding: 20px;
+`
+
+export const CategoryGrid = styled.div`
+	display: grid;
+	gap: 1em;
+	grid-template-columns: repeat(2, 1fr);
+	padding-bottom: 20px;
+`
+
+export const DataContainer = styled.div`
+	text-align: left;
+`
+export const CategoryMainTitle = styled.h1`
+	${RemoveSpaces};
+	text-align: left;
+	color: #333;
+	font-size: 1.5em;
+	padding-bottom: 15px;
+`
+
+export const Title = styled.h3`
+	${RemoveSpaces};
+	color: #333;
+	font-size: 1em;
+`
+
+export const Content = styled.p`
+	${RemoveSpaces};
+	color: #333;
+	font-size: 1.2em;
 `

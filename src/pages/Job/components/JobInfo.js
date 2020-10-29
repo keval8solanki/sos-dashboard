@@ -1,21 +1,26 @@
 import React from 'react'
 import styled from 'styled-components'
 import {
+	Card,
+	Category,
+	CategoryGrid,
+	CategoryMainTitle,
 	CategoryTitle,
+	Content,
+	DataContainer,
 	DataContent,
 	DataTitle,
 	themeBorder,
+	Title,
 } from '../../../styles'
 import JobDetails from '../JobDetails'
 import { v4 as uuid } from 'uuid'
+import { formatDate } from '../../../utils/helperFunctions'
 
 function JobInfo({ job }) {
-	const renderList = (data) =>
-		data && data.map((item) => <li key={uuid()}>{item}</li>)
-
-	const { companyDetails, jobAddress, jobDetails, jobOpeningInfo } = job
-	const { companyName, companyAddress } = companyDetails
-	const { city, country, jobLocation, pincode, state, zone } = jobAddress
+	const { companyDetails, jobAddress, jobDetails, jobOpeningInfo } = job || {}
+	const { companyName, companyAddress } = companyDetails || {}
+	const { city, country, jobLocation, pincode, state, zone } = jobAddress || {}
 	const {
 		eligibility,
 		responsibilities,
@@ -24,93 +29,123 @@ function JobInfo({ job }) {
 		additionalInformation,
 		jobDescription,
 		targetDate,
-	} = jobDetails
+	} = jobDetails || {}
 
-	const {
-		assignedOn,
-		industry,
-		jobTitle,
-		jobType,
-		noOfOpenings,
-	} = jobOpeningInfo
+	const { assignedOn, industry, jobTitle, jobType, noOfOpenings } =
+		jobOpeningInfo || {}
+
+	const renderList = (arr) =>
+		arr.map((item) => {
+			return (
+				<DataContainer key={uuid()}>
+					<Content>{item}</Content>
+				</DataContainer>
+			)
+		})
 
 	return (
-		<JobInfoContainer>
-			<DataContainer>
-				<CategoryTitle>Job Opening Info</CategoryTitle>
-				<DataTitle>Assigned on</DataTitle>
-				<DataContent>{job.jobOpeningInfo.assignedOn}</DataContent>
+		<Card>
+			<Category>
+				<CategoryMainTitle>Job Opening Info</CategoryMainTitle>
+				<CategoryGrid>
+					<DataContainer>
+						<Title>Job Title</Title>
+						<Content>{jobTitle}</Content>
+					</DataContainer>
 
-				<DataTitle>Industry</DataTitle>
-				<DataContent>{job.jobOpeningInfo.industry}</DataContent>
+					<DataContainer>
+						<Title>Job Type</Title>
+						<Content>{jobType}</Content>
+					</DataContainer>
 
-				<DataTitle>Job Title</DataTitle>
-				<DataContent>{job.jobOpeningInfo.jobTitle}</DataContent>
+					<DataContainer>
+						<Title>Industry</Title>
+						<Content>{industry}</Content>
+					</DataContainer>
 
-				<DataTitle>Job Type</DataTitle>
-				<DataContent>{job.jobOpeningInfo.jobType}</DataContent>
+					<DataContainer>
+						<Title>Openings</Title>
+						<Content>{noOfOpenings}</Content>
+					</DataContainer>
+				</CategoryGrid>
+			</Category>
 
-				<DataTitle>No of Openings</DataTitle>
-				<DataContent>{job.jobOpeningInfo.noOfOpenings}</DataContent>
-			</DataContainer>
-			<DataContainer>
-				<CategoryTitle>Job Address</CategoryTitle>
+			<Category>
+				<CategoryMainTitle>Job Address</CategoryMainTitle>
+				<CategoryGrid>
+					<DataContainer>
+						<Title>Job Location</Title>
+						<Content>{jobLocation}</Content>
+					</DataContainer>
 
-				<DataTitle>City</DataTitle>
-				<DataContent>{job.jobAddress.city}</DataContent>
+					<DataContainer>
+						<Title>City</Title>
+						<Content>{city}</Content>
+					</DataContainer>
 
-				<DataTitle>Country</DataTitle>
-				<DataContent>{job.jobAddress.country}</DataContent>
+					<DataContainer>
+						<Title>Zone</Title>
+						<Content>{zone}</Content>
+					</DataContainer>
 
-				<DataTitle>Job Location</DataTitle>
-				<DataContent>{job.jobAddress.jobLocation}</DataContent>
+					<DataContainer>
+						<Title>State</Title>
+						<Content>{state}</Content>
+					</DataContainer>
 
-				<DataTitle>Pincode</DataTitle>
-				<DataContent>{job.jobAddress.pincode}</DataContent>
+					<DataContainer>
+						<Title>Pincode</Title>
+						<Content>{pincode}</Content>
+					</DataContainer>
 
-				<DataTitle>State</DataTitle>
-				<DataContent>{job.jobAddress.state}</DataContent>
+					<DataContainer>
+						<Title>Country</Title>
+						<Content>{country}</Content>
+					</DataContainer>
+				</CategoryGrid>
+			</Category>
 
-				<DataTitle>Zone</DataTitle>
-				<DataContent>{job.jobAddress.zone}</DataContent>
-			</DataContainer>
-			<DataContainer>
-				<CategoryTitle>Job Details</CategoryTitle>
-				<DataTitle>Job Code</DataTitle>
-				<DataContent>{job.jobDetails.jobCode}</DataContent>
-				<DataTitle>Job Description</DataTitle>
-				<DataContent>{job.jobDetails.jobDescription}</DataContent>
-				<DataTitle>Additional Information</DataTitle>
-				<DataContent>{job.jobDetails.additionalInformation}</DataContent>
-				<DataTitle>Eligibility</DataTitle>
-				<ol>{renderList(job.jobDetails.eligibility)}</ol>
+			<Category>
+				<CategoryMainTitle>Job Details</CategoryMainTitle>
+				<CategoryGrid>
+					<DataContainer>
+						<Title>Job Code</Title>
+						<Content>{jobCode}</Content>
+					</DataContainer>
 
-				<DataTitle>Responsiblities</DataTitle>
-				<ol>{renderList(job.jobDetails.responsibilities)}</ol>
+					<DataContainer>
+						<Title>Job Description</Title>
+						<Content>{jobDescription}</Content>
+					</DataContainer>
 
-				<DataTitle>Benefits</DataTitle>
-				<ol>{renderList(job.jobDetails.benefits)}</ol>
-			</DataContainer>
-			<DataContainer>
-				<CategoryTitle>Company Details</CategoryTitle>
-				<DataTitle>Company Name</DataTitle>
-				<DataContent>{job.companyDetails.companyName}</DataContent>
-				<DataTitle>Company Address</DataTitle>
-				<DataContent>{job.companyDetails.companyAddress}</DataContent>
-			</DataContainer>
-		</JobInfoContainer>
+					<DataContainer>
+						<Title>Additional Information</Title>
+						<Content>{additionalInformation}</Content>
+					</DataContainer>
+
+					<DataContainer>
+						<Title>Target Date</Title>
+						<Content>{formatDate(targetDate)}</Content>
+					</DataContainer>
+				</CategoryGrid>
+			</Category>
+
+			<Category>
+				<CategoryMainTitle>Eligibility</CategoryMainTitle>
+				<CategoryGrid>{renderList(eligibility)}</CategoryGrid>
+			</Category>
+
+			<Category>
+				<CategoryMainTitle>Responsibility</CategoryMainTitle>
+				<CategoryGrid>{renderList(responsibilities)}</CategoryGrid>
+			</Category>
+
+			<Category>
+				<CategoryMainTitle>Benifits</CategoryMainTitle>
+				<CategoryGrid>{renderList(benefits)}</CategoryGrid>
+			</Category>
+		</Card>
 	)
 }
 
 export default JobInfo
-const JobInfoContainer = styled.div`
-	background-color: white;
-	${themeBorder};
-
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-`
-
-const DataContainer = styled.div``

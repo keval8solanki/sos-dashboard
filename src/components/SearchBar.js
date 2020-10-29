@@ -1,16 +1,16 @@
-import { Card, themeBorder } from '../styles'
-import React, { useEffect, useMemo, useState } from 'react'
-import styled from 'styled-components'
 import { Button, MenuItem, Select } from '@material-ui/core'
+import React, { useState } from 'react'
+import styled from 'styled-components'
 import SearchIcon from '../assets/icons/search.svg'
+import { themeBorder } from '../styles'
+import { v4 as uuid } from 'uuid'
 
 function SearchBar({ options }) {
 	const [searchCriteria, setSearchCriteria] = useState(options[0].value)
 	const [searchVal, setSearchVal] = useState('')
-	console.log(searchVal)
 	const renderOption = () =>
 		options.map(({ value, name }) => {
-			return <MenuItem value={value}>{name}</MenuItem>
+			return <MenuItem key={uuid()} value={value}>{name}</MenuItem>
 		})
 
 

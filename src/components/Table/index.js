@@ -1,7 +1,6 @@
-import { Checkbox } from '@material-ui/core'
 import React from 'react'
 import styled from 'styled-components'
-import { themeBorder, TableHead, StyledCheckbox } from '../../styles'
+import { themeBorder } from '../../styles'
 
 function Table({ headings, children }) {
 	return (

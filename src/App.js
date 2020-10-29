@@ -22,24 +22,28 @@ import Navbar from './components/Navbar'
 import AddRole from './pages/Role/AddRole'
 import AddUser from './pages/User/AddUser'
 import EditJob from './pages/Job/EditJob'
-import Axios from 'axios'
+import axios from 'axios'
 import { verifyEndpoint } from './api'
+import AppliedCandidate from './pages/Candidate/AppliedCandidate'
+import EditCandidate from './pages/Candidate/EditCandidate'
+import Loader from './components/Loader'
 
 function App() {
 	const [isAuth, setAuth] = useRecoilState(isAuthAtom)
 	const [currentUser, setCurrentUser] = useRecoilState(currentUserAtom)
 
-	// const cred = useRecoilValue(credentialAtom)
+	// CurrentUser Null --> skeleton
 
 	useEffect(() => {
-		Axios.post(verifyEndpoint, {}, { withCredentials: true })
+		axios
+			.post(verifyEndpoint, {}, { withCredentials: true })
 			.then(({ data }) => {
 				setAuth(true)
 				setCurrentUser(data.userData)
 			})
 			.catch((e) => {
 				setAuth(false)
-				setCurrentUser(null)
+				setCurrentUser({})
 			})
 	}, [])
 
@@ -53,6 +57,8 @@ function App() {
 			<Route path='/job' component={JobPage} />
 
 			<Route path='/candidate/add' component={AddCandidate} />
+			<Route path='/candidate/edit/:id' component={EditCandidate} />
+
 			<Route path='/candidate/:id' component={CandidateDetails} />
 			<Route path='/candidate' component={CandidatePage} />
 
@@ -66,24 +72,29 @@ function App() {
 			<Route path='/user' component={UserPage} />
 
 			<Route path='/profile' component={ProfilePage} />
+			<Route path='/applied/:id' component={AppliedCandidate} />
 		</Switch>
 	)
 
 	return (
 		<AppContainer>
-			<HashRouter>
-				{isAuth ? (
-					<>
-						<Navbar />
-						<Layout>
-							<Sidebar />
-							<ComponentContainer>{routes}</ComponentContainer>
-						</Layout>
-					</>
-				) : (
-					<Route path='/' exact component={Signin} />
-				)}
-			</HashRouter>
+			{currentUser ? (
+				<HashRouter>
+					{isAuth ? (
+						<>
+							<Navbar />
+							<Layout>
+								<Sidebar />
+								<ComponentContainer>{routes}</ComponentContainer>
+							</Layout>
+						</>
+					) : (
+						<Route path='/' exact component={Signin} />
+					)}
+				</HashRouter>
+			) : (
+				<Loader />
+			)}
 		</AppContainer>
 	)
 }

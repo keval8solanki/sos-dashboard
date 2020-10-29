@@ -10,16 +10,23 @@ import Controls from '../../components/Controls'
 import AddIcon from '../../assets/icons/add.svg'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { roleAtom, roleCheckedAtom } from '../../recoil/atoms'
-import Axios from 'axios'
+import { currentUserAtom, roleAtom, roleCheckedAtom } from '../../recoil/atoms'
+import axios from 'axios'
 import { rolesEndpoint } from '../../api'
 import Table from '../../components/Table'
 import { v4 as uuid } from 'uuid'
-import { formatDate, renderWithLoader, titleGenerator } from '../../utils/helperFunctions'
+import {
+	formatDate,
+	renderWithLoader,
+	titleGenerator,
+} from '../../utils/helperFunctions'
 import { selectedRoles } from '../../recoil/selectors'
 import { IconButton } from '@material-ui/core'
 import { AddCircle, Delete } from '@material-ui/icons'
 import DeleteModal from '../../components/Modals/DeleteModal'
+import { toast } from '../../components/Toast'
+import { get } from 'lodash'
+import { SMUIIconButton } from '../../styles/StyledMaterialUI'
 
 function RolePage() {
 	const history = useHistory()
@@ -28,10 +35,12 @@ function RolePage() {
 	const [checked, setChecked] = useRecoilState(roleCheckedAtom)
 	const selected = useRecoilValue(selectedRoles)
 	const [isModalOpen, setIsModalOpen] = useState(false)
+	const currentUser = useRecoilValue(currentUserAtom)
 	const toggleModal = () => setIsModalOpen(!isModalOpen)
 
 	useEffect(() => {
-		Axios.get(rolesEndpoint)
+		axios
+			.get(rolesEndpoint, { withCredentials: true })
 			.then(({ data }) => setRoles(data))
 			.catch((e) => console.log(e))
 	}, [isModalOpen])
@@ -42,11 +51,14 @@ function RolePage() {
 
 	const deleteHandler = async () => {
 		try {
-			await Axios.patch(rolesEndpoint, selected)
+			await axios.patch(rolesEndpoint, selected, { withCredentials: true })
 			toggleModal()
 			setChecked({})
+			toast.success('Roles Deleted')
 		} catch (error) {
-			alert(error)
+			toggleModal()
+
+			toast.error('Something went wrong')
 		}
 	}
 
@@ -64,7 +76,7 @@ function RolePage() {
 		roles &&
 		roles.map(({ _id, name, vendor, users, createdAt }) => {
 			return (
-				<TableRow key={uuid()}>
+				<TableRow key={_id}>
 					<TableData>
 						<StyledCheckbox
 							onChange={(e) => checkHandler(e, _id)}
@@ -85,13 +97,21 @@ function RolePage() {
 		<>
 			<Controls title={titleGenerator(selected, 'Roles')}>
 				{selected.length > 0 ? (
-					<IconButton color='secondary' onClick={toggleModal}>
-						<Delete />
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.role.delete') && (
+							<SMUIIconButton color='secondary' onClick={toggleModal}>
+								<Delete />
+							</SMUIIconButton>
+						)}
+					</>
 				) : (
-					<IconButton color='primary' onClick={() => navHandler('add')}>
-						<AddCircle />
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.role.create') && (
+							<SMUIIconButton color='primary' onClick={() => navHandler('add')}>
+								<AddCircle />
+							</SMUIIconButton>
+						)}
+					</>
 				)}
 
 				{/* <IconButton onClick={() => navHandler('add')} src={AddIcon} /> */}

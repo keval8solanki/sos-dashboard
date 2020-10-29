@@ -1,6 +1,6 @@
 import { Checkbox, TextField } from '@material-ui/core'
-import Axios from 'axios'
-import React, { useState } from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { roleEndpoint } from '../../../api'
 import Controls from '../../../components/Controls'
@@ -14,7 +14,12 @@ import {
 } from '../../../styles'
 import { SMUITextField } from '../../../styles/StyledMaterialUI'
 
+import { toast } from '../../../components/Toast'
+import { useHistory } from 'react-router-dom'
+
 function RoleInput() {
+	const history = useHistory()
+
 	const [name, setName] = useState('')
 	const [vendor, setVendor] = useState('')
 
@@ -46,32 +51,45 @@ function RoleInput() {
 	}
 
 	const [permissions, setPermissions] = useState(defaultPermissions)
-	console.log(permissions)
+
+	useEffect(() => {}, [])
 
 	const resetHandler = () => {}
 
 	const submitHandler = async () => {
+		console.log({ permissions })
 		const roleData = {
 			name,
 			vendor,
 			permissions,
 		}
 		try {
-			await Axios.post(roleEndpoint, roleData)
-			alert('Role Added')
+			await axios.post(roleEndpoint, roleData, { withCredentials: true })
+			history.goBack()
+			toast.success('New Role Added')
 		} catch (error) {
-			alert(error)
+			toast.error('Something went wrong')
 		}
-		console.log(roleData)
 	}
 
 	const checkHandler = (e, role, type) => {
+		const checked = e.target.checked
 		const permissionsTemp = { ...permissions[role] }
-		permissionsTemp[type] = e.target.checked
-		setPermissions({
-			...permissions,
-			[role]: permissionsTemp,
-		})
+		permissionsTemp[type] = checked
+		if (
+			!(
+				type === 'read' &&
+				(permissionsTemp['delete'] || permissionsTemp['update'])
+			)
+		) {
+			if ((type === 'delete' && checked) || (type === 'update' && checked)) {
+				permissionsTemp['read'] = checked
+			}
+			setPermissions({
+				...permissions,
+				[role]: permissionsTemp,
+			})
+		}
 	}
 
 	const selectAllHandler = (e, role) => {
@@ -102,11 +120,13 @@ function RoleInput() {
 				<Card>
 					<CardTitle>Role Details</CardTitle>
 					<SMUITextField
+						variant='outlined'
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						label='Role Name'
 					/>
 					<SMUITextField
+						variant='outlined'
 						value={vendor}
 						onChange={(e) => setVendor(e.target.value)}
 						label='Vendor'

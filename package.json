@@ -1,7 +1,7 @@
 {
   "name": "sos-dashboard",
   "version": "0.1.0",
-	"homepage": "https://keval8solanki.github.io/sos-dashboard",
+  "homepage": "https://keval8solanki.github.io/sos-dashboard",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "^2.10.6",
@@ -13,17 +13,22 @@
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.20.0",
     "bcryptjs": "^2.4.3",
+    "chart.js": "^2.9.3",
     "crypto-js": "^4.0.0",
     "date-fns": "^2.16.1",
     "dotenv": "^8.2.0",
     "generate-password": "^1.5.1",
     "lodash": "^4.17.20",
     "react": "^16.13.1",
+    "react-chartjs-2": "^2.10.0",
     "react-dom": "^16.13.1",
+    "react-event-timeline": "^1.6.3",
+    "react-loading-skeleton": "^2.1.1",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-table": "^7.5.0",
+    "react-timeline-scribble": "^1.0.14",
     "react-toastify": "^6.0.8",
     "recoil": "0.0.10",
     "redux": "^4.0.5",
@@ -32,11 +37,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-		"build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject",
-		"predeploy": "npm run build",
-		"deploy": "gh-pages -d build"
+    "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"

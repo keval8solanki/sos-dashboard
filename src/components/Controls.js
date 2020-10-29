@@ -1,18 +1,8 @@
-import { Card } from '@material-ui/core'
 import React from 'react'
 import styled from 'styled-components'
 import { RemoveSpaces } from '../styles'
-import SearchBar from './SearchBar'
 
 function Controls({ title, children }) {
-	const options = [
-		{ value: 'jobCode', name: 'Job Code' },
-		{ value: 'jobTitle', name: 'Job Title' },
-		{ value: 'company', name: 'company' },
-		{ value: 'city', name: 'City' },
-		{ value: 'noOfOpening', name: 'Openings' },
-		{ value: 'noOfResume', name: 'Resume' },
-	]
 	return (
 		<ControlContainer>
 			<ControlTitle>{title}</ControlTitle>
@@ -44,4 +34,6 @@ const ControlTitle = styled.h4`
 	color: #333;
 `
 
-const ControlButtonContainer = styled.div``
+const ControlButtonContainer = styled.div`
+	display: flex;
+`

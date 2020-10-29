@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import {
 	Button,
 	FormControl,
+	IconButton,
 	Modal,
 	Select,
 	TextField,
@@ -22,8 +23,8 @@ export const SMUITextField = styled(TextField)`
 export const SMUISelect = styled(Select)`
 	&& {
 		width: 100%;
-		margin: 10px 0px;
-		padding: 5px 0px;
+		/* margin: 10px 0px; */
+		/* padding: 5px 0px; */
 
 		text-align: left;
 	}
@@ -31,14 +32,21 @@ export const SMUISelect = styled(Select)`
 export const SMUIFormControl = styled(FormControl)`
 	&& {
 		width: 100%;
-		/* margin: 10px 0px; */
+		margin: 10px 0px;
 		text-align: left;
 	}
 `
+export const SMUIIconButton = styled(IconButton)`
+	&&{
+		padding: 0px;
+	}
+`
+
 export const SMUIModal = styled(Modal)`
 	&& {
 		position: fixed;
-		top: 60px;
+		top: auto;
+		bottom: auto;
 		left: auto;
 		margin: 0 auto;
 		right: auto;

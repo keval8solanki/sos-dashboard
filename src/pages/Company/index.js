@@ -5,7 +5,6 @@ import {
 	TableHead,
 	TableData,
 	TableRow,
-	RemoveSpaces,
 	ModalBody,
 	ModalTitle,
 	ModalWarning,
@@ -13,21 +12,29 @@ import {
 	ModalButtonContainer,
 } from '../../styles'
 import Controls from '../../components/Controls'
-import { Button, IconButton } from '@material-ui/core'
+import { IconButton } from '@material-ui/core'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { companyAtom, companyCheckedAtom } from '../../recoil/atoms'
-import Axios from 'axios'
+import {
+	companyAtom,
+	companyCheckedAtom,
+	currentUserAtom,
+} from '../../recoil/atoms'
+import axios from 'axios'
 import { companiesEndpoint } from '../../api'
 import { v4 as uuid } from 'uuid'
 import Table from '../../components/Table'
-import { formatDate, renderWithLoader, trueKeysToArr } from '../../utils/helperFunctions'
+import {
+	formatDate,
+	renderWithLoader,
+} from '../../utils/helperFunctions'
 import { selectedCompanies } from '../../recoil/selectors'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
-import Modal from '@material-ui/core/Modal'
-import styled from 'styled-components'
-import { SMUIButton, SMUIModal } from '../../styles/StyledMaterialUI'
+import { SMUIButton, SMUIIconButton, SMUIModal } from '../../styles/StyledMaterialUI'
+
+import { toast } from '../../components/Toast'
+import { get } from 'lodash'
 
 function CompanyPage() {
 	const history = useHistory()
@@ -35,12 +42,11 @@ function CompanyPage() {
 	const [companies, setCompanies] = useRecoilState(companyAtom)
 	const [checked, setChecked] = useRecoilState(companyCheckedAtom)
 	const [isModalOpen, setIsModalOpen] = useState(false)
-	const [isSelectAll, setIsSelectAll] = useState(false)
-
+	const currentUser = useRecoilValue(currentUserAtom)
 	const selectedCompany = useRecoilValue(selectedCompanies)
 
 	useEffect(() => {
-		Axios.get(companiesEndpoint)
+		axios.get(companiesEndpoint, { withCredentials: true })
 			.then(({ data }) => setCompanies(data))
 			.catch((e) => console.log(e))
 	}, [isModalOpen])
@@ -48,9 +54,7 @@ function CompanyPage() {
 	const navHandler = (to) => {
 		history.push(`${location}/${to}`)
 	}
-
-	const selectAllHandler = () => {}
-
+	
 	const companyHeading = [
 		'Select',
 		'Company Name',
@@ -63,18 +67,6 @@ function CompanyPage() {
 		<TableHead key={uuid()}>{heading}</TableHead>
 	))
 
-	const companyHeadingWithCheckbox = (
-		<>
-			<TableHead>
-				<StyledCheckbox
-					checked={isSelectAll}
-					onChange={selectAllHandler}
-					type='checkbox'
-				/>
-			</TableHead>
-			{renderCompanyHeading}
-		</>
-	)
 
 	const checkHandler = (e, _id) => {
 		setChecked({ ...checked, [_id]: e.target.checked })
@@ -82,12 +74,16 @@ function CompanyPage() {
 
 	const deleteManyHandler = async () => {
 		try {
-			// console.log(selectedCompany)
-			await Axios.patch(companiesEndpoint, selectedCompany)
+			await axios.patch(companiesEndpoint, selectedCompany, {
+				withCredentials: true,
+			})
 			toggleModal()
 			setChecked({})
+			toast.success('Companies deleted')
 		} catch (error) {
-			alert(error)
+			toggleModal()
+
+			toast.success('Something went wrong')
 		}
 	}
 
@@ -118,13 +114,21 @@ function CompanyPage() {
 		<>
 			<Controls title='Company'>
 				{selectedCompany.length > 0 ? (
-					<IconButton color='secondary' onClick={toggleModal}>
-						<DeleteIcon />
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.job.delete') && (
+							<SMUIIconButton color='secondary' onClick={toggleModal}>
+								<DeleteIcon />
+							</SMUIIconButton>
+						)}
+					</>
 				) : (
-					<IconButton color='primary' onClick={() => navHandler('add')}>
-						<AddCircleIcon />
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.job.create') && (
+							<SMUIIconButton color='primary' onClick={() => navHandler('add')}>
+								<AddCircleIcon />
+							</SMUIIconButton>
+						)}
+					</>
 				)}
 			</Controls>
 			<SMUIModal open={isModalOpen} onClose={toggleModal}>

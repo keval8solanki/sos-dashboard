@@ -1,4 +1,4 @@
-import Axios from 'axios'
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import styled from 'styled-components'
@@ -10,33 +10,45 @@ import {
 	getJobs,
 } from '../../api'
 import Table from '../../components/Table'
-import { candidateAtom, candidateCheckedAtom } from '../../recoil/atoms'
+import {
+	candidateAtom,
+	candidateCheckedAtom,
+	currentUserAtom,
+} from '../../recoil/atoms'
 import {
 	PageLayout,
 	TableData,
 	TableHead,
 	TableRow,
-	
 	StyledCheckbox,
 	ContentContainer,
 	ControlButton,
 } from '../../styles'
+
 import Checkbox from '@material-ui/core/Checkbox'
+
 import Controls from '../../components/Controls'
-import { IconButton } from '@material-ui/core'
 import { NavLink, useHistory, useLocation } from 'react-router-dom'
+
 import {
 	formatDate,
 	renderWithLoader,
 	titleGenerator,
 	trueKeysToArr,
 } from '../../utils/helperFunctions'
+
 import { useRecoilValue } from 'recoil'
 import { filterTrueCandidateChecked } from '../../recoil/selectors'
 import SearchBar from '../../components/SearchBar'
 import AddIcon from '../../assets/icons/add.svg'
 import DeleteModal from '../../components/Modals/DeleteModal'
 import { AddCircle, Delete } from '@material-ui/icons'
+
+import { toast } from '../../components/Toast'
+import { get } from 'lodash'
+import { v4 as uuid } from 'uuid'
+import { SMUIIconButton } from '../../styles/StyledMaterialUI'
+
 
 function CandidatePage() {
 	// React Hooks
@@ -45,6 +57,8 @@ function CandidatePage() {
 	const [checked, setChecked] = useRecoilState(candidateCheckedAtom)
 	const selected = useRecoilValue(filterTrueCandidateChecked)
 
+	const currentUser = useRecoilValue(currentUserAtom)
+
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const toggleModal = () => setIsModalOpen(!isModalOpen)
 
@@ -52,7 +66,7 @@ function CandidatePage() {
 	const location = useLocation().pathname
 
 	useEffect(() => {
-		Axios.get(getCandidates)
+		axios.get(getCandidates, { withCredentials: true })
 			.then(({ data }) => setCandidateData(data))
 			.catch((e) => console.log(e))
 	}, [checked, isModalOpen])
@@ -81,30 +95,21 @@ function CandidatePage() {
 	}
 
 	const renderCandidateHeading = candidateHeading.map((heading) => (
-		<TableHead>{heading}</TableHead>
+		<TableHead key={uuid()}>{heading}</TableHead>
 	))
 
 	const deleteHandler = async () => {
 		try {
-			await Axios.patch(candidatesEndpoint, selected)
+			await axios.patch(candidatesEndpoint, selected, { withCredentials: true })
 			toggleModal()
 			setChecked({})
+			toast.success('Candidates Deleted')
 		} catch (error) {
-			alert(error)
+			toggleModal()
+
+			toast.error('Something went wrong')
 		}
 	}
-
-	// const applyHandler = async () => {
-	// 	try {
-	// 		await Axios.post(applyJob, {
-	// 			candidates: ids,
-	// 			jobs,
-	// 			userId: '5f647ab5a39e2d43e85044a0',
-	// 		})
-	// 	} catch (err) {
-	// 		console.log(err)
-	// 	}
-	// }
 
 	// Renderers
 	const renderCandidateData =
@@ -146,20 +151,34 @@ function CandidatePage() {
 			<Controls title={titleGenerator(selected, 'Candidate Controls')}>
 				{selected.length > 0 ? (
 					<>
-						<IconButton onClick={toggleModal} color='secondary'>
-							<Delete/>
-						</IconButton>
-						<ControlButton
-							variant='contained'
-							color='primary'
-							onClick={() => toPage('/job/apply')}>
-							Assign
-						</ControlButton>
+						{get(currentUser, 'roleId.permissions.candidate.delete') && (
+							<SMUIIconButton
+								color='secondary'
+								onClick={toggleModal}
+								color='secondary'>
+								<Delete />
+							</SMUIIconButton>
+						)}
+
+						{get(currentUser, 'roleId.permissions.candidate.update') && (
+							<ControlButton
+								variant='contained'
+								color='primary'
+								onClick={() => toPage('/job/apply')}>
+								Assign
+							</ControlButton>
+						)}
 					</>
 				) : (
-						<IconButton onClick={() => toPage(`${location}/add`)} >
-							<AddCircle/>
-					</IconButton>
+					<>
+						{get(currentUser, 'roleId.permissions.candidate.create') && (
+							<SMUIIconButton
+								color='primary'
+								onClick={() => toPage(`${location}/add`)}>
+								<AddCircle />
+							</SMUIIconButton>
+						)}
+					</>
 				)}
 				{/* <Button variant="contained" color="primary">Import</Button>
 				<Button variant="contained" color="primary">Export</Button> */}
