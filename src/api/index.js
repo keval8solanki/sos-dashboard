@@ -2,7 +2,7 @@ const STAGE = process.env.NODE_ENV === 'production' ? true : false
 
 export const API_URI = STAGE
 	? 'https://sos-api-zn34.onrender.com'
-	: 'http://localhost:8008'
+	: 'https://8008-idx-personal-vm-1735964987653.cluster-qpa6grkipzc64wfjrbr3hsdma2.cloudworkstations.dev'
 
 export const createJob = `${API_URI}/job`
 export const getJobs = `${API_URI}/jobs`

@@ -92,7 +92,7 @@ export const encryptObj = (obj) => {
 	const objStr = JSON.stringify(obj)
 	return cryptojs.AES.encrypt(
 		objStr,
-		process.env.REACT_APP_ENCRYPTION_SECRET_KEY
+		import.meta.env.VITE_ENCRYPTION_SECRET_KEY
 	).toString()
 }
 
