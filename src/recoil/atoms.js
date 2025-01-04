@@ -1,5 +1,4 @@
 import { atom, selector } from 'recoil'
-import { trueKeysToArr } from '../utils/helperFunctions'
 
 export const jobAtom = atom({
 	key: 'jobs',
